@@ -62,6 +62,11 @@ class Album extends Model
         return $this->hasMany(Track::class)->orderBy('position');
     }
 
+    public function takes(): HasMany
+    {
+        return $this->hasMany(Take::class);
+    }
+
     public function getCoverArtUrlAttribute($value): ?string
     {
         if ($value) {

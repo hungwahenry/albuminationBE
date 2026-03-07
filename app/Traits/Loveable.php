@@ -14,6 +14,10 @@ trait Loveable
 
     public function isLovedBy(int $userId): bool
     {
+        if ($this->relationLoaded('loves')) {
+            return $this->loves->where('user_id', $userId)->isNotEmpty();
+        }
+
         return $this->loves()->where('user_id', $userId)->exists();
     }
 }

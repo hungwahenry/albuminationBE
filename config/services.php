@@ -40,4 +40,8 @@ return [
         'user_agent' => env('MUSICBRAINZ_USER_AGENT', 'Albumination/1.0.0 (albumination@example.com)'),
     ],
 
+    'giphy' => [
+        'api_key' => env('GIPHY_API_KEY'),
+    ],
+
 ];

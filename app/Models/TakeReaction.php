@@ -4,15 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Love extends Model
+class TakeReaction extends Model
 {
-    protected $table = 'loves';
-
     public $timestamps = false;
 
-    protected $fillable = ['user_id', 'loveable_type', 'loveable_id'];
+    protected $fillable = ['user_id', 'take_id', 'type'];
 
     protected function casts(): array
     {
@@ -26,8 +23,8 @@ class Love extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function loveable(): MorphTo
+    public function take(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(Take::class);
     }
 }
