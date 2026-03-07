@@ -5,13 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Scout\Searchable;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 class Artist extends Model
 {
-    use Searchable;
+    use HasSlug, Searchable;
 
     protected $fillable = [
         'mbid',
+        'slug',
         'name',
         'sort_name',
         'type',
@@ -21,6 +24,14 @@ class Artist extends Model
         'end_date',
         'image_url',
     ];
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug')
+            ->slugsShouldBeNoLongerThan(200);
+    }
 
     protected function casts(): array
     {

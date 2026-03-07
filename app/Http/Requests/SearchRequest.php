@@ -16,7 +16,7 @@ class SearchRequest extends FormRequest
         return [
             'q' => ['required', 'string', 'min:2', 'max:100'],
             'types' => ['sometimes', 'array'],
-            'types.*' => ['string', 'in:artist,album,track,user'],
+            'types.*' => ['string', 'in:artist,album,user'],
             'limit' => ['sometimes', 'integer', 'min:1', 'max:50'],
         ];
     }

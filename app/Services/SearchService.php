@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 
 class SearchService
 {
-    private const VALID_TYPES = ['album', 'user', 'artist', 'track'];
+    private const VALID_TYPES = ['album', 'user', 'artist'];
     private const MB_CACHE_TTL = 300; // 5 minutes
 
     public function __construct(private MusicBrainzService $musicBrainz) {}

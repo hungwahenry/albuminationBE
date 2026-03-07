@@ -6,18 +6,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Scout\Searchable;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 class Track extends Model
 {
-    use Searchable;
+    use HasSlug, Searchable;
 
     protected $fillable = [
         'mbid',
+        'slug',
         'title',
         'length',
         'position',
         'album_id',
     ];
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->slugsShouldBeNoLongerThan(200);
+    }
 
     protected function casts(): array
     {

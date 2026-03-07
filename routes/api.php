@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\AlbumController;
+use App\Http\Controllers\LoveController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,5 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Routes requiring completed onboarding
     Route::middleware('onboarding')->group(function () {
         Route::get('/search', SearchController::class);
+        Route::get('/albums/{mbid}', [AlbumController::class, 'show']);
+        Route::post('/albums/{mbid}/love', [LoveController::class, 'toggleAlbum']);
     });
 });
