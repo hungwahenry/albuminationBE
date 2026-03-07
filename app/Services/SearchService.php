@@ -6,6 +6,7 @@ use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Profile;
 use App\Models\Track;
+use App\Services\CoverArtService;
 use App\Services\MusicBrainz\MusicBrainzService;
 use Illuminate\Support\Facades\Cache;
 
@@ -102,11 +103,11 @@ class SearchService
                     'type' => $rg['primary-type'] ?? null,
                     'release_date' => $rg['first-release-date'] ?? null,
                     'cover_art_url' => CoverArtService::url($rg['id']),
-                    'artists' => collect($rg['artist-credit'] ?? [])->map(fn (array $credit) => [
+                    'artists' => collect($rg['artist-credit'] ?? [])->filter(fn ($credit) => is_array($credit))->map(fn (array $credit) => [
                         'mbid' => $credit['artist']['id'] ?? null,
                         'name' => $credit['artist']['name'] ?? $credit['name'] ?? null,
                         'join_phrase' => $credit['joinphrase'] ?? null,
-                    ])->all(),
+                    ])->values()->all(),
                 ])
                 ->keyBy('mbid');
         });
@@ -148,11 +149,11 @@ class SearchService
                         'mbid' => $rec['releases'][0]['id'],
                         'title' => $rec['releases'][0]['title'],
                     ] : null,
-                    'artists' => collect($rec['artist-credit'] ?? [])->map(fn (array $credit) => [
+                    'artists' => collect($rec['artist-credit'] ?? [])->filter(fn ($credit) => is_array($credit))->map(fn (array $credit) => [
                         'mbid' => $credit['artist']['id'] ?? null,
                         'name' => $credit['artist']['name'] ?? $credit['name'] ?? null,
                         'join_phrase' => $credit['joinphrase'] ?? null,
-                    ])->all(),
+                    ])->values()->all(),
                 ])
                 ->keyBy('mbid');
         });
