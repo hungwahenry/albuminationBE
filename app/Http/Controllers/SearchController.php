@@ -41,6 +41,7 @@ class SearchController extends Controller
                 : $items;
         }
 
-        return $this->success($formatted);
+        return $this->success($formatted)
+            ->header('Cache-Control', 'private, max-age=300');
     }
 }

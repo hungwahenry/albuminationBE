@@ -4,15 +4,11 @@ namespace App\Services\MusicBrainz;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class MusicBrainzClient
 {
-    private const RATE_LIMIT_KEY = 'musicbrainz:last_request';
-    private const RATE_LIMIT_MS = 1000;
-
     private string $baseUrl;
     private string $userAgent;
 
@@ -70,8 +66,6 @@ class MusicBrainzClient
 
     private function get(string $path, array $params = []): ?array
     {
-        $this->throttle();
-
         try {
             $response = $this->http()->get($this->baseUrl . $path, $params);
         } catch (ConnectionException $e) {
@@ -82,8 +76,6 @@ class MusicBrainzClient
 
             return null;
         }
-
-        Cache::put(self::RATE_LIMIT_KEY, now()->getPreciseTimestamp(), 2);
 
         if ($response->failed()) {
             Log::warning('MusicBrainz API request failed', [
@@ -104,20 +96,6 @@ class MusicBrainzClient
             'Accept' => 'application/json',
         ])->withOptions([
             'handler' => \GuzzleHttp\HandlerStack::create(new \GuzzleHttp\Handler\StreamHandler()),
-        ])->timeout(10)->retry(2, self::RATE_LIMIT_MS);
-    }
-
-    private function throttle(): void
-    {
-        $lastRequest = Cache::get(self::RATE_LIMIT_KEY);
-
-        if ($lastRequest) {
-            $elapsedUs = now()->getPreciseTimestamp() - $lastRequest;
-            $waitUs = max(0, (self::RATE_LIMIT_MS * 1000) - (int) $elapsedUs);
-
-            if ($waitUs > 0) {
-                usleep($waitUs);
-            }
-        }
+        ])->timeout(10)->retry(2, 500);
     }
 }

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 
 class SearchService
 {
-    private const VALID_TYPES = ['artist', 'album', 'track', 'user'];
+    private const VALID_TYPES = ['album', 'user', 'artist', 'track'];
     private const MB_CACHE_TTL = 300; // 5 minutes
 
     public function __construct(private MusicBrainzService $musicBrainz) {}
@@ -27,13 +27,12 @@ class SearchService
             : self::VALID_TYPES;
 
         $results = [];
-
         foreach ($types as $type) {
             $results[$type . 's'] = match ($type) {
                 'artist' => $this->searchArtists($query, $limit),
-                'album' => $this->searchAlbums($query, $limit),
-                'track' => $this->searchTracks($query, $limit),
-                'user' => $this->searchUsers($query, $limit),
+                'album'  => $this->searchAlbums($query, $limit),
+                'track'  => $this->searchTracks($query, $limit),
+                'user'   => $this->searchUsers($query, $limit),
             };
         }
 
