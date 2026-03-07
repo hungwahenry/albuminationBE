@@ -11,7 +11,6 @@ use App\Services\AuthService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -48,6 +47,11 @@ class AuthController extends Controller
     public function completeOnboarding(CompleteOnboardingRequest $request): JsonResponse
     {
         $user = $request->user();
+
+        if ($user->hasCompletedOnboarding()) {
+            return $this->error('Onboarding already completed.', 422);
+        }
+
         $validated = $request->validated();
 
         if ($request->hasFile('avatar')) {

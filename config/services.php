@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'musicbrainz' => [
+        'base_url' => env('MUSICBRAINZ_BASE_URL', 'https://musicbrainz.org/ws/2'),
+        'user_agent' => env('MUSICBRAINZ_USER_AGENT', 'Albumination/1.0.0 (albumination@example.com)'),
+        'rate_limit' => env('MUSICBRAINZ_RATE_LIMIT', 1000), // milliseconds between requests
+    ],
+
 ];

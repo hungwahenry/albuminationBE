@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Scout\Searchable;
 
 class Profile extends Model
 {
+    use Searchable;
+
     protected $fillable = [
         'user_id',
         'username',
@@ -24,6 +27,14 @@ class Profile extends Model
         return [
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+        ];
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'username' => $this->username,
+            'display_name' => $this->display_name,
         ];
     }
 
