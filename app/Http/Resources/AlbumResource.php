@@ -33,6 +33,7 @@ class AlbumResource extends JsonResource
                 'title' => $track->title,
                 'length' => $track->length,
                 'position' => $track->position,
+                'favourites_count' => $track->favourites_count,
                 'is_favourited' => Auth::check() ? $track->isFavouritedBy(Auth::id()) : false,
                 'artists' => $track->artists->map(fn ($artist) => [
                     'mbid' => $artist->mbid,

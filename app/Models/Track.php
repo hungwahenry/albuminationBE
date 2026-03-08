@@ -19,6 +19,7 @@ class Track extends Model
         'title',
         'length',
         'position',
+        'favourites_count',
         'album_id',
     ];
 
@@ -35,6 +36,7 @@ class Track extends Model
         return [
             'length' => 'integer',
             'position' => 'integer',
+            'favourites_count' => 'integer',
         ];
     }
 

@@ -13,10 +13,12 @@ class TrackFavouriteService
 
         if ($exists) {
             $user->favouriteTracks()->detach($track->id);
-            return ['is_favourited' => false];
+            $track->decrement('favourites_count');
+            return ['is_favourited' => false, 'favourites_count' => max(0, $track->favourites_count)];
         }
 
         $user->favouriteTracks()->attach($track->id);
-        return ['is_favourited' => true];
+        $track->increment('favourites_count');
+        return ['is_favourited' => true, 'favourites_count' => $track->favourites_count];
     }
 }
