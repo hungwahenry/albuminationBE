@@ -17,6 +17,13 @@ class RotationController extends Controller
 
     public function __construct(private RotationService $service) {}
 
+    private function eagerLoadFor(Rotation $rotation): array
+    {
+        return $rotation->type === 'album'
+            ? ['vibetags', 'items.album.artists', 'user.profile']
+            : ['vibetags', 'items.track.artists', 'items.track.album', 'user.profile'];
+    }
+
     public function index(Request $request): JsonResponse
     {
         $rotations = $request->user()
@@ -44,11 +51,7 @@ class RotationController extends Controller
             return $this->error('Rotation not found', 404);
         }
 
-        $eagerLoad = $rotation->type === 'album'
-            ? ['vibetags', 'items.album.artists', 'user.profile']
-            : ['vibetags', 'items.track.artists', 'items.track.album', 'user.profile'];
-
-        $rotation->load($eagerLoad);
+        $rotation->load($this->eagerLoadFor($rotation));
 
         return $this->success(new RotationResource($rotation));
     }
@@ -61,7 +64,7 @@ class RotationController extends Controller
 
         $rotation = $this->service->update($rotation, $request->validated());
 
-        return $this->success(new RotationResource($rotation->load('user.profile')));
+        return $this->success(new RotationResource($rotation->load($this->eagerLoadFor($rotation))));
     }
 
     public function destroy(Request $request, Rotation $rotation): JsonResponse
@@ -87,7 +90,7 @@ class RotationController extends Controller
 
         $rotation = $this->service->publish($rotation);
 
-        return $this->success(new RotationResource($rotation->load(['vibetags', 'user.profile'])));
+        return $this->success(new RotationResource($rotation->load($this->eagerLoadFor($rotation))));
     }
 
     public function redraft(Request $request, Rotation $rotation): JsonResponse
@@ -102,6 +105,6 @@ class RotationController extends Controller
 
         $rotation = $this->service->redraft($rotation);
 
-        return $this->success(new RotationResource($rotation->load(['vibetags', 'user.profile'])));
+        return $this->success(new RotationResource($rotation->load($this->eagerLoadFor($rotation))));
     }
 }

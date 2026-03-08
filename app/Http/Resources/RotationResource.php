@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 class RotationResource extends JsonResource
 {
@@ -15,9 +14,7 @@ class RotationResource extends JsonResource
             'slug'            => $this->slug,
             'title'           => $this->title,
             'caption'         => $this->caption,
-            'cover_image_url' => $this->cover_image
-                ? Storage::disk('public')->url($this->cover_image)
-                : null,
+            'cover_image_url' => $this->cover_image,
             'type'            => $this->type,
             'is_ranked'       => $this->is_ranked,
             'is_public'       => $this->is_public,
