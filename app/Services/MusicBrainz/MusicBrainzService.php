@@ -103,6 +103,11 @@ class MusicBrainzService
         return $this->client->search('recording', $query, $limit, $offset);
     }
 
+    public function lookupRecording(string $mbid): ?array
+    {
+        return $this->client->lookup('recording', $mbid, ['releases', 'artist-credits', 'release-groups']);
+    }
+
     /**
      * Fetch all tracks for an album from MusicBrainz and store them.
      */
@@ -187,7 +192,7 @@ class MusicBrainzService
         return $album;
     }
 
-    private function syncArtistCredits(Album|Track $entity, array $credits): void
+    public function syncArtistCredits(Album|Track $entity, array $credits): void
     {
         $pivotData = [];
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -39,6 +40,11 @@ class User extends Authenticatable
     public function favouriteTracks(): BelongsToMany
     {
         return $this->belongsToMany(Track::class, 'track_favourites');
+    }
+
+    public function rotations(): HasMany
+    {
+        return $this->hasMany(Rotation::class);
     }
 
     public function hasCompletedOnboarding(): bool

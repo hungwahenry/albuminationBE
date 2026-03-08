@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\GiphyController;
 use App\Http\Controllers\LoveController;
+use App\Http\Controllers\RotationController;
+use App\Http\Controllers\RotationItemController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TakeController;
 use App\Http\Controllers\TakeReactionController;
@@ -52,6 +54,20 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{take}/replies', [TakeReplyController::class, 'store']);
             Route::delete('/{take}/replies/{reply}', [TakeReplyController::class, 'destroy']);
             Route::post('/{take}/replies/{reply}/love', [LoveController::class, 'toggleReply']);
+        });
+
+        // Rotations
+        Route::prefix('rotations')->group(function () {
+            Route::get('/', [RotationController::class, 'index']);
+            Route::post('/', [RotationController::class, 'store']);
+            Route::get('/{rotation}', [RotationController::class, 'show']);
+            Route::put('/{rotation}', [RotationController::class, 'update']);
+            Route::delete('/{rotation}', [RotationController::class, 'destroy']);
+            Route::post('/{rotation}/publish', [RotationController::class, 'publish']);
+            Route::post('/{rotation}/redraft', [RotationController::class, 'redraft']);
+            Route::post('/{rotation}/items', [RotationItemController::class, 'store']);
+            Route::delete('/{rotation}/items/{item}', [RotationItemController::class, 'destroy']);
+            Route::post('/{rotation}/items/reorder', [RotationItemController::class, 'reorder']);
         });
     });
 });
