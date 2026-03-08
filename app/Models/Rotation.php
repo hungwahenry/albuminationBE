@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Loveable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,7 +12,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class Rotation extends Model
 {
-    use HasSlug;
+    use HasSlug, Loveable;
 
     protected $fillable = [
         'user_id',
@@ -24,6 +25,8 @@ class Rotation extends Model
         'is_public',
         'status',
         'items_count',
+        'loves_count',
+        'comments_count',
         'published_at',
     ];
 
@@ -41,6 +44,8 @@ class Rotation extends Model
             'is_ranked' => 'boolean',
             'is_public' => 'boolean',
             'items_count' => 'integer',
+            'loves_count' => 'integer',
+            'comments_count' => 'integer',
             'published_at' => 'datetime',
         ];
     }
@@ -58,6 +63,11 @@ class Rotation extends Model
     public function items(): HasMany
     {
         return $this->hasMany(RotationItem::class)->orderBy('position');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(RotationComment::class);
     }
 
     public function isOwnedBy(int $userId): bool

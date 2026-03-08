@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class RotationResource extends JsonResource
 {
@@ -20,6 +21,9 @@ class RotationResource extends JsonResource
             'is_public'       => $this->is_public,
             'status'          => $this->status,
             'items_count'     => $this->items_count,
+            'loves_count'     => $this->loves_count,
+            'comments_count'  => $this->comments_count,
+            'is_loved'        => Auth::check() ? $this->isLovedBy(Auth::id()) : false,
             'published_at'    => $this->published_at?->toISOString(),
             'created_at'      => $this->created_at->toISOString(),
             'user'            => [

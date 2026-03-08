@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Album;
+use App\Models\Rotation;
+use App\Models\RotationComment;
 use App\Models\Take;
 use App\Models\TakeReply;
 use App\Services\LoveService;
@@ -36,6 +38,28 @@ class LoveController extends Controller
         }
 
         $result = $this->loveService->toggle($request->user(), $reply);
+
+        return $this->success($result);
+    }
+
+    public function toggleRotation(Request $request, Rotation $rotation): JsonResponse
+    {
+        if (!$rotation->isPublished() && !$rotation->isOwnedBy($request->user()->id)) {
+            return $this->error('Rotation not found', 404);
+        }
+
+        $result = $this->loveService->toggle($request->user(), $rotation);
+
+        return $this->success($result);
+    }
+
+    public function toggleComment(Request $request, Rotation $rotation, RotationComment $comment): JsonResponse
+    {
+        if ($comment->rotation_id !== $rotation->id) {
+            return $this->error('Comment not found', 404);
+        }
+
+        $result = $this->loveService->toggle($request->user(), $comment);
 
         return $this->success($result);
     }

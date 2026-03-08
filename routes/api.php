@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\GiphyController;
 use App\Http\Controllers\LoveController;
+use App\Http\Controllers\RotationCommentController;
 use App\Http\Controllers\RotationController;
 use App\Http\Controllers\RotationItemController;
 use App\Http\Controllers\SearchController;
@@ -68,6 +69,16 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{rotation}/items', [RotationItemController::class, 'store']);
             Route::delete('/{rotation}/items/{item}', [RotationItemController::class, 'destroy']);
             Route::post('/{rotation}/items/reorder', [RotationItemController::class, 'reorder']);
+
+            // Love
+            Route::post('/{rotation}/love', [LoveController::class, 'toggleRotation']);
+
+            // Comments
+            Route::get('/{rotation}/comments', [RotationCommentController::class, 'index']);
+            Route::post('/{rotation}/comments', [RotationCommentController::class, 'store']);
+            Route::get('/{rotation}/comments/{comment}/replies', [RotationCommentController::class, 'replies']);
+            Route::delete('/{rotation}/comments/{comment}', [RotationCommentController::class, 'destroy']);
+            Route::post('/{rotation}/comments/{comment}/love', [LoveController::class, 'toggleComment']);
         });
     });
 });
