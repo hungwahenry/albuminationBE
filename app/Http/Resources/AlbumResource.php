@@ -19,6 +19,8 @@ class AlbumResource extends JsonResource
             'cover_art_url' => $this->cover_art_url,
             'loves_count' => $this->loves_count,
             'takes_count' => $this->takes_count,
+            'hits_count'  => $this->hits_count,
+            'misses_count' => $this->misses_count,
             'is_loved'    => Auth::check() ? $this->isLovedBy(Auth::id()) : false,
             'artists' => $this->artists->map(fn ($artist) => [
                 'mbid' => $artist->mbid,

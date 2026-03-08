@@ -25,6 +25,7 @@ class TakeService
         ]);
 
         $album->increment('takes_count');
+        $album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
 
         return $take->load('user.profile');
     }
@@ -38,11 +39,18 @@ class TakeService
             abort(422, 'You can only edit your take once.');
         }
 
+        $oldRating = $take->rating;
+
         $take->update([
             'rating'    => $rating,
             'body'      => $body,
             'edited_at' => now(),
         ]);
+
+        if ($oldRating !== $rating) {
+            $take->album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
+            $take->album->decrement($oldRating === 'hit' ? 'hits_count' : 'misses_count');
+        }
 
         return $take->load('user.profile');
     }
@@ -54,5 +62,8 @@ class TakeService
     {
         $take->update(['is_deleted' => true]);
         $take->album->decrement('takes_count');
+        if ($take->rating) {
+            $take->album->decrement($take->rating === 'hit' ? 'hits_count' : 'misses_count');
+        }
     }
 }

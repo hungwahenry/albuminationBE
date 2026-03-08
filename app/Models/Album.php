@@ -24,6 +24,8 @@ class Album extends Model
         'cover_art_url',
         'loves_count',
         'takes_count',
+        'hits_count',
+        'misses_count',
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -40,6 +42,8 @@ class Album extends Model
             'release_date' => 'date',
             'loves_count'  => 'integer',
             'takes_count'  => 'integer',
+            'hits_count'   => 'integer',
+            'misses_count' => 'integer',
         ];
     }
 
