@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ListRotationsRequest;
 use App\Http\Requests\StoreRotationRequest;
 use App\Http\Requests\UpdateRotationRequest;
 use App\Http\Resources\RotationResource;
@@ -24,13 +25,25 @@ class RotationController extends Controller
             : ['vibetags', 'items.track.artists', 'items.track.album', 'user.profile'];
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(ListRotationsRequest $request): JsonResponse
     {
-        $rotations = $request->user()
+        $validated = $request->validated();
+
+        $query = $request->user()
             ->rotations()
             ->with(['vibetags', 'user.profile'])
-            ->latest()
-            ->paginate(20);
+            ->when($validated['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
+            ->when($validated['type'] ?? null, fn ($q, $type) => $q->where('type', $type))
+            ->when($validated['sort'] ?? null, function ($q, $sort) {
+                match ($sort) {
+                    'oldest' => $q->oldest(),
+                    'alphabetical' => $q->orderBy('title'),
+                    'recently_updated' => $q->latest('updated_at'),
+                    default => $q->latest(),
+                };
+            }, fn ($q) => $q->latest());
+
+        $rotations = $query->paginate(20);
 
         return $this->success(RotationResource::collection($rotations)->response()->getData(true));
     }
