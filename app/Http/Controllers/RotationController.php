@@ -6,7 +6,9 @@ use App\Http\Requests\ListRotationsRequest;
 use App\Http\Requests\StoreRotationRequest;
 use App\Http\Requests\UpdateRotationRequest;
 use App\Http\Resources\RotationResource;
+use App\Models\Album;
 use App\Models\Rotation;
+use App\Models\Track;
 use App\Services\RotationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +30,7 @@ class RotationController extends Controller
     public function index(ListRotationsRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        $containsMbid = $validated['contains_mbid'] ?? null;
 
         $query = $request->user()
             ->rotations()
@@ -42,6 +45,24 @@ class RotationController extends Controller
                     default => $q->latest(),
                 };
             }, fn ($q) => $q->latest());
+
+        if ($containsMbid) {
+            $type = $validated['type'] ?? null;
+            $entityId = null;
+
+            if ($type === 'album') {
+                $entityId = Album::where('mbid', $containsMbid)->value('id');
+            } elseif ($type === 'track') {
+                $entityId = Track::where('mbid', $containsMbid)->value('id');
+            }
+
+            if ($entityId) {
+                $fk = $type === 'album' ? 'album_id' : 'track_id';
+                $query->withExists([
+                    'items as contains_item' => fn ($q) => $q->where($fk, $entityId),
+                ]);
+            }
+        }
 
         $rotations = $query->paginate(20);
 
@@ -99,6 +120,10 @@ class RotationController extends Controller
 
         if ($rotation->isPublished()) {
             return $this->error('Rotation is already published', 422);
+        }
+
+        if ($rotation->items()->count() === 0) {
+            return $this->error('Cannot publish a rotation with no items', 422);
         }
 
         $rotation = $this->service->publish($rotation);

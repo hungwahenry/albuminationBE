@@ -14,9 +14,10 @@ class ListRotationsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['sometimes', 'in:draft,published'],
-            'type'   => ['sometimes', 'in:album,track'],
-            'sort'   => ['sometimes', 'in:newest,oldest,alphabetical,recently_updated'],
+            'status'        => ['sometimes', 'in:draft,published'],
+            'type'          => ['sometimes', 'in:album,track'],
+            'sort'          => ['sometimes', 'in:newest,oldest,alphabetical,recently_updated'],
+            'contains_mbid' => ['sometimes', 'string', 'max:40'],
         ];
     }
 }

@@ -34,6 +34,7 @@ class RotationResource extends JsonResource
             ],
             'vibetags'        => VibetagResource::collection($this->whenLoaded('vibetags')),
             'items'           => RotationItemResource::collection($this->whenLoaded('items')),
+            'contains_item'   => $this->when($this->resource->getAttribute('contains_item') !== null, (bool) $this->resource->getAttribute('contains_item')),
         ];
     }
 }
