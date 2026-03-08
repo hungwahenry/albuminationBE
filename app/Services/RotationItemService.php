@@ -102,16 +102,29 @@ class RotationItemService
 
         if (!$data || !isset($data['id'])) return null;
 
-        // Try to find a release-group so we can store the full album
+        // Try to find a release-group so we can store the full album.
+        // Prefer Album/EP release-groups over Singles/others.
         $releases = $data['releases'] ?? [];
         $album = null;
+        $fallbackRgId = null;
 
         foreach ($releases as $release) {
             $rgId = $release['release-group']['id'] ?? null;
             if (!$rgId) continue;
 
-            $album = $this->albumService->show($rgId);
-            if ($album) break;
+            $rgType = $release['release-group']['primary-type'] ?? null;
+
+            if (in_array($rgType, ['Album', 'EP'], true)) {
+                $album = $this->albumService->show($rgId);
+                if ($album) break;
+            } elseif (!$fallbackRgId) {
+                $fallbackRgId = $rgId;
+            }
+        }
+
+        // Fall back to Single/other if no Album/EP was found
+        if (!$album && $fallbackRgId) {
+            $album = $this->albumService->show($fallbackRgId);
         }
 
         // Track should now exist from album fetch
