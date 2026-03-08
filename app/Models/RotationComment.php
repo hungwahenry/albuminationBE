@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Traits\Loveable;
+use App\Traits\Reportable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RotationComment extends Model
 {
-    use Loveable;
+    use Loveable, Reportable;
 
     protected $fillable = [
         'user_id',

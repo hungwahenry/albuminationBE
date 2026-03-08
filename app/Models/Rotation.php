@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Loveable;
+use App\Traits\Reportable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,7 +13,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class Rotation extends Model
 {
-    use HasSlug, Loveable;
+    use HasSlug, Loveable, Reportable;
 
     protected $fillable = [
         'user_id',

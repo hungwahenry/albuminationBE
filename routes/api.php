@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\GiphyController;
 use App\Http\Controllers\LoveController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RotationCommentController;
 use App\Http\Controllers\RotationController;
 use App\Http\Controllers\RotationItemController;
@@ -79,6 +80,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{rotation}/comments/{comment}/replies', [RotationCommentController::class, 'replies']);
             Route::delete('/{rotation}/comments/{comment}', [RotationCommentController::class, 'destroy']);
             Route::post('/{rotation}/comments/{comment}/love', [LoveController::class, 'toggleComment']);
+        });
+
+        // Reports
+        Route::prefix('reports')->group(function () {
+            Route::get('/reasons', [ReportController::class, 'reasons']);
+            Route::post('/', [ReportController::class, 'store']);
         });
     });
 });
