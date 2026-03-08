@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Laravel\Scout\Searchable;
 
 class Profile extends Model
@@ -24,6 +25,10 @@ class Profile extends Model
         'following_count',
         'rotations_count',
         'takes_count',
+        'header_album_id',
+        'pinned_rotation_id',
+        'current_vibe_type',
+        'current_vibe_id',
     ];
 
     protected function casts(): array
@@ -49,5 +54,20 @@ class Profile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function headerAlbum(): BelongsTo
+    {
+        return $this->belongsTo(Album::class, 'header_album_id');
+    }
+
+    public function pinnedRotation(): BelongsTo
+    {
+        return $this->belongsTo(Rotation::class, 'pinned_rotation_id');
+    }
+
+    public function currentVibe(): MorphTo
+    {
+        return $this->morphTo('current_vibe');
     }
 }

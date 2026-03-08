@@ -97,6 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('users/{username}')->group(function () {
             Route::get('/', [ProfileController::class, 'show']);
             Route::get('/rotations', [ProfileController::class, 'rotations']);
+            Route::get('/takes', [ProfileController::class, 'takes']);
             Route::post('/follow', [FollowController::class, 'toggle']);
             Route::get('/followers', [FollowController::class, 'followers']);
             Route::get('/following', [FollowController::class, 'following']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\PublicProfileResource;
 use App\Http\Resources\RotationResource;
+use App\Http\Resources\TakeResource;
 use App\Models\Profile;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,13 @@ class ProfileController extends Controller
      */
     public function show(Request $request, string $username): JsonResponse
     {
-        $profile = Profile::where('username', $username)->first();
+        $profile = Profile::where('username', $username)
+            ->with([
+                'headerAlbum.artists',
+                'pinnedRotation',
+                'currentVibe.artists',
+            ])
+            ->first();
 
         if (!$profile) {
             return $this->error('User not found', 404);
@@ -83,8 +90,41 @@ class ProfileController extends Controller
             $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
 
+        // Map short vibe type to morph class
+        if (array_key_exists('current_vibe_type', $data)) {
+            $vibeTypeMap = ['album' => \App\Models\Album::class, 'track' => \App\Models\Track::class];
+            $data['current_vibe_type'] = $data['current_vibe_type']
+                ? ($vibeTypeMap[$data['current_vibe_type']] ?? null)
+                : null;
+            if (!$data['current_vibe_type']) {
+                $data['current_vibe_id'] = null;
+            }
+        }
+
         $profile->update($data);
 
-        return $this->success(new PublicProfileResource($request->user()->load('profile')));
+        return $this->success(new PublicProfileResource(
+            $request->user()->load(['profile.headerAlbum.artists', 'profile.pinnedRotation', 'profile.currentVibe.artists'])
+        ));
+    }
+
+    /**
+     * Get a user's takes.
+     */
+    public function takes(Request $request, string $username): JsonResponse
+    {
+        $profile = Profile::where('username', $username)->first();
+
+        if (!$profile) {
+            return $this->error('User not found', 404);
+        }
+
+        $takes = $profile->user->takes()
+            ->with(['user.profile', 'album.artists'])
+            ->where('is_deleted', false)
+            ->latest()
+            ->paginate(20);
+
+        return $this->success(TakeResource::collection($takes)->response()->getData(true));
     }
 }

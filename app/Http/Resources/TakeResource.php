@@ -18,6 +18,15 @@ class TakeResource extends JsonResource
                 'display_name' => $this->user->profile->display_name,
                 'avatar'       => $this->user->profile->avatar,
             ],
+            'album'           => $this->when($this->relationLoaded('album'), function () {
+                return [
+                    'id'            => $this->album->id,
+                    'mbid'          => $this->album->mbid,
+                    'title'         => $this->album->title,
+                    'artist_name'   => $this->album->artists->pluck('name')->join(', '),
+                    'cover_art_url' => $this->album->cover_art_url,
+                ];
+            }),
             'rating'          => $this->is_deleted ? null : $this->rating,
             'body'            => $this->is_deleted ? null : $this->body,
             'is_deleted'      => $this->is_deleted,

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Profile;
 use App\Models\Rotation;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
@@ -78,6 +79,9 @@ class RotationService
 
         $rotation->user->profile->decrement('rotations_count');
 
+        // Clear any profiles that have this rotation pinned
+        Profile::where('pinned_rotation_id', $rotation->id)->update(['pinned_rotation_id' => null]);
+
         return $rotation;
     }
 
@@ -86,6 +90,9 @@ class RotationService
         if ($rotation->status === 'published') {
             $rotation->user->profile->decrement('rotations_count');
         }
+
+        // Clear any profiles that have this rotation pinned
+        Profile::where('pinned_rotation_id', $rotation->id)->update(['pinned_rotation_id' => null]);
 
         $this->vibetagService->detachAll($rotation);
 
