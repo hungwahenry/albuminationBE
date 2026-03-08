@@ -72,6 +72,15 @@ class User extends Authenticatable
         return $this->following()->where('following_id', $userId)->exists();
     }
 
+    public function isFollowedBy(int $userId): bool
+    {
+        if ($this->relationLoaded('followers')) {
+            return $this->followers->where('follower_id', $userId)->isNotEmpty();
+        }
+
+        return $this->followers()->where('follower_id', $userId)->exists();
+    }
+
     public function hasCompletedOnboarding(): bool
     {
         return $this->onboarding_completed_at !== null;

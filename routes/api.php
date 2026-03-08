@@ -14,6 +14,7 @@ use App\Http\Controllers\TakeReactionController;
 use App\Http\Controllers\TakeReplyController;
 use App\Http\Controllers\TrackFavouriteController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileCustomizationController;
 use App\Http\Controllers\FollowController;
 use Illuminate\Support\Facades\Route;
 
@@ -92,6 +93,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Profile
         Route::put('/profile', [ProfileController::class, 'update']);
+
+        // Profile Customization
+        Route::prefix('profile/customization')->group(function () {
+            Route::put('/header-album', [ProfileCustomizationController::class, 'setHeaderAlbum']);
+            Route::put('/pinned-rotation', [ProfileCustomizationController::class, 'setPinnedRotation']);
+            Route::put('/current-vibe', [ProfileCustomizationController::class, 'setCurrentVibe']);
+        });
 
         // Users (public profiles)
         Route::prefix('users/{username}')->group(function () {

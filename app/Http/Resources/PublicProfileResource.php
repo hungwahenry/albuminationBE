@@ -27,6 +27,9 @@ class PublicProfileResource extends JsonResource
             'is_following'    => Auth::check() && Auth::id() !== $user->id
                 ? $request->user()->isFollowing($user->id)
                 : false,
+            'is_followed_by'  => Auth::check() && Auth::id() !== $user->id
+                ? $user->isFollowing(Auth::id())
+                : false,
             'is_own_profile'  => Auth::check() && Auth::id() === $user->id,
             'header_album'    => $this->formatHeaderAlbum($profile),
             'pinned_rotation' => $this->formatPinnedRotation($profile),

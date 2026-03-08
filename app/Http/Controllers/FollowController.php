@@ -59,11 +59,12 @@ class FollowController extends Controller
             $user = $follow->follower;
 
             return [
-                'id'           => $user->id,
-                'username'     => $user->profile->username,
-                'display_name' => $user->profile->display_name,
-                'avatar'       => $user->profile->avatar,
-                'is_following' => $request->user()->isFollowing($user->id),
+                'id'             => $user->id,
+                'username'       => $user->profile->username,
+                'display_name'   => $user->profile->display_name,
+                'avatar'         => $user->profile->avatar,
+                'is_following'   => $request->user()->isFollowing($user->id),
+                'is_followed_by' => $user->isFollowing($request->user()->id),
             ];
         });
 
@@ -98,11 +99,12 @@ class FollowController extends Controller
             $user = $follow->following;
 
             return [
-                'id'           => $user->id,
-                'username'     => $user->profile->username,
-                'display_name' => $user->profile->display_name,
-                'avatar'       => $user->profile->avatar,
-                'is_following' => $request->user()->isFollowing($user->id),
+                'id'             => $user->id,
+                'username'       => $user->profile->username,
+                'display_name'   => $user->profile->display_name,
+                'avatar'         => $user->profile->avatar,
+                'is_following'   => $request->user()->isFollowing($user->id),
+                'is_followed_by' => $user->isFollowing($request->user()->id),
             ];
         });
 
