@@ -27,6 +27,8 @@ class TakeService
         $album->increment('takes_count');
         $album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
 
+        $user->profile->increment('takes_count');
+
         return $take->load('user.profile');
     }
 
@@ -65,5 +67,7 @@ class TakeService
         if ($take->rating) {
             $take->album->decrement($take->rating === 'hit' ? 'hits_count' : 'misses_count');
         }
+
+        $take->user->profile->decrement('takes_count');
     }
 }

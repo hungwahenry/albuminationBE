@@ -64,6 +64,8 @@ class RotationService
             'published_at' => now(),
         ]);
 
+        $rotation->user->profile->increment('rotations_count');
+
         return $rotation;
     }
 
@@ -74,11 +76,17 @@ class RotationService
             'published_at' => null,
         ]);
 
+        $rotation->user->profile->decrement('rotations_count');
+
         return $rotation;
     }
 
     public function delete(Rotation $rotation): void
     {
+        if ($rotation->status === 'published') {
+            $rotation->user->profile->decrement('rotations_count');
+        }
+
         $this->vibetagService->detachAll($rotation);
 
         if ($rotation->cover_image) {

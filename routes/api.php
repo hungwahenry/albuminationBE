@@ -13,6 +13,8 @@ use App\Http\Controllers\TakeController;
 use App\Http\Controllers\TakeReactionController;
 use App\Http\Controllers\TakeReplyController;
 use App\Http\Controllers\TrackFavouriteController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FollowController;
 use Illuminate\Support\Facades\Route;
 
 // Public auth routes
@@ -86,6 +88,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('reports')->group(function () {
             Route::get('/reasons', [ReportController::class, 'reasons']);
             Route::post('/', [ReportController::class, 'store']);
+        });
+
+        // Profile
+        Route::put('/profile', [ProfileController::class, 'update']);
+
+        // Users (public profiles)
+        Route::prefix('users/{username}')->group(function () {
+            Route::get('/', [ProfileController::class, 'show']);
+            Route::get('/rotations', [ProfileController::class, 'rotations']);
+            Route::post('/follow', [FollowController::class, 'toggle']);
+            Route::get('/followers', [FollowController::class, 'followers']);
+            Route::get('/following', [FollowController::class, 'following']);
         });
     });
 });

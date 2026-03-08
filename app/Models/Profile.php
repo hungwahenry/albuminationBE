@@ -20,6 +20,10 @@ class Profile extends Model
         'latitude',
         'longitude',
         'place_name',
+        'followers_count',
+        'following_count',
+        'rotations_count',
+        'takes_count',
     ];
 
     protected function casts(): array
@@ -27,6 +31,10 @@ class Profile extends Model
         return [
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+            'followers_count' => 'integer',
+            'following_count' => 'integer',
+            'rotations_count' => 'integer',
+            'takes_count' => 'integer',
         ];
     }
 

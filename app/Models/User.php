@@ -48,6 +48,30 @@ class User extends Authenticatable
         return $this->hasMany(Rotation::class);
     }
 
+    public function takes(): HasMany
+    {
+        return $this->hasMany(Take::class);
+    }
+
+    public function followers(): HasMany
+    {
+        return $this->hasMany(Follow::class, 'following_id');
+    }
+
+    public function following(): HasMany
+    {
+        return $this->hasMany(Follow::class, 'follower_id');
+    }
+
+    public function isFollowing(int $userId): bool
+    {
+        if ($this->relationLoaded('following')) {
+            return $this->following->where('following_id', $userId)->isNotEmpty();
+        }
+
+        return $this->following()->where('following_id', $userId)->exists();
+    }
+
     public function hasCompletedOnboarding(): bool
     {
         return $this->onboarding_completed_at !== null;
