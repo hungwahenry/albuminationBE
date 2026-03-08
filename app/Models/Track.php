@@ -56,4 +56,16 @@ class Track extends Model
             ->withPivot(['join_phrase', 'order'])
             ->orderByPivot('order');
     }
+
+    public function favouritedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'track_favourites')
+            ->withTimestamps(false);
+    }
+
+    public function isFavouritedBy(?int $userId): bool
+    {
+        if (!$userId) return false;
+        return $this->favouritedBy()->where('user_id', $userId)->exists();
+    }
 }

@@ -28,10 +28,12 @@ class AlbumResource extends JsonResource
                 'join_phrase' => $artist->pivot->join_phrase,
             ]),
             'tracks' => $this->tracks->map(fn ($track) => [
+                'id' => $track->id,
                 'mbid' => $track->mbid,
                 'title' => $track->title,
                 'length' => $track->length,
                 'position' => $track->position,
+                'is_favourited' => Auth::check() ? $track->isFavouritedBy(Auth::id()) : false,
                 'artists' => $track->artists->map(fn ($artist) => [
                     'mbid' => $artist->mbid,
                     'name' => $artist->name,

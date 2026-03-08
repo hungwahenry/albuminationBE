@@ -8,6 +8,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TakeController;
 use App\Http\Controllers\TakeReactionController;
 use App\Http\Controllers\TakeReplyController;
+use App\Http\Controllers\TrackFavouriteController;
 use Illuminate\Support\Facades\Route;
 
 // Public auth routes
@@ -36,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::get('/albums/{mbid}', [AlbumController::class, 'show']);
         Route::post('/albums/{mbid}/love', [LoveController::class, 'toggleAlbum']);
+        Route::post('/albums/{mbid}/tracks/{track}/favourite', [TrackFavouriteController::class, 'toggle']);
 
         // Takes
         Route::prefix('albums/{mbid}/takes')->group(function () {
