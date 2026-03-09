@@ -127,6 +127,7 @@ class SearchService
                 'album' => $track->album ? [
                     'mbid' => $track->album->mbid,
                     'title' => $track->album->title,
+                    'cover_art_url' => $track->album->cover_art_url,
                 ] : null,
                 'artists' => $track->artists->map(fn (Artist $a) => [
                     'mbid' => $a->mbid,
@@ -140,20 +141,28 @@ class SearchService
             $mbData = $this->musicBrainz->searchTracks($query, $limit);
 
             return collect($mbData['recordings'] ?? [])
-                ->map(fn (array $rec) => [
-                    'mbid' => $rec['id'],
-                    'title' => $rec['title'],
-                    'length' => $rec['length'] ?? null,
-                    'album' => isset($rec['releases'][0]) ? [
-                        'mbid' => $rec['releases'][0]['id'],
-                        'title' => $rec['releases'][0]['title'],
-                    ] : null,
-                    'artists' => collect($rec['artist-credit'] ?? [])->filter(fn ($credit) => is_array($credit))->map(fn (array $credit) => [
-                        'mbid' => $credit['artist']['id'] ?? null,
-                        'name' => $credit['artist']['name'] ?? $credit['name'] ?? null,
-                        'join_phrase' => $credit['joinphrase'] ?? null,
-                    ])->values()->all(),
-                ])
+                ->map(function (array $rec) {
+                    $release = $rec['releases'][0] ?? null;
+                    $rgId = $release['release-group']['id'] ?? null;
+
+                    return [
+                        'mbid' => $rec['id'],
+                        'title' => $rec['title'],
+                        'length' => $rec['length'] ?? null,
+                        'album' => $release ? [
+                            'mbid' => $rgId ?? $release['id'],
+                            'title' => $release['title'],
+                            'cover_art_url' => $rgId ? CoverArtService::url($rgId) : null,
+                        ] : null,
+                        'artists' => collect($rec['artist-credit'] ?? [])
+                            ->filter(fn ($credit) => is_array($credit))
+                            ->map(fn (array $credit) => [
+                                'mbid' => $credit['artist']['id'] ?? null,
+                                'name' => $credit['artist']['name'] ?? $credit['name'] ?? null,
+                                'join_phrase' => $credit['joinphrase'] ?? null,
+                            ])->values()->all(),
+                    ];
+                })
                 ->keyBy('mbid');
         });
 
