@@ -61,6 +61,7 @@ class MusicBrainzClient
             'query' => $query,
             'limit' => $limit,
             'offset' => $offset,
+            'dismax' => 'true',
         ]);
     }
 
