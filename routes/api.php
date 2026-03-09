@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\AlbumController;
+use App\Http\Controllers\CoverController;
 use App\Http\Controllers\GiphyController;
 use App\Http\Controllers\LoveController;
 use App\Http\Controllers\ReportController;
@@ -16,7 +17,11 @@ use App\Http\Controllers\TrackFavouriteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileCustomizationController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\UsernameController;
 use Illuminate\Support\Facades\Route;
+
+// Public routes
+Route::get('/covers', CoverController::class);
 
 // Public auth routes
 Route::prefix('auth')->group(function () {
@@ -32,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/onboarding', [AuthController::class, 'completeOnboarding']);
     Route::get('/auth/user', [AuthController::class, 'user']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::get('/username/check', [UsernameController::class, 'check']);
 
     // Routes requiring completed onboarding
     Route::middleware('onboarding')->group(function () {

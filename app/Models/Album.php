@@ -21,7 +21,6 @@ class Album extends Model
         'title',
         'type',
         'release_date',
-        'cover_art_url',
         'loves_count',
         'takes_count',
         'hits_count',
@@ -71,12 +70,8 @@ class Album extends Model
         return $this->hasMany(Take::class);
     }
 
-    public function getCoverArtUrlAttribute($value): ?string
+    public function getCoverArtUrlAttribute(): string
     {
-        if ($value) {
-            return $value;
-        }
-
         return CoverArtService::url($this->mbid);
     }
 }
