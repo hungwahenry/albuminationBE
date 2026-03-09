@@ -12,6 +12,23 @@ class PublicProfileResource extends JsonResource
     {
         $user = $this->resource;
         $profile = $user->profile;
+        $isOther = Auth::check() && Auth::id() !== $user->id;
+
+        $isBlocked = $isOther ? $request->user()->hasBlocked($user->id) : false;
+        $isBlockedBy = $isOther ? $user->hasBlocked(Auth::id()) : false;
+
+        // If the viewer is blocked by this user, return minimal data
+        if ($isBlockedBy) {
+            return [
+                'id'             => $user->id,
+                'username'       => $profile->username,
+                'display_name'   => $profile->display_name,
+                'avatar'         => $profile->avatar,
+                'is_own_profile' => false,
+                'is_blocked'     => $isBlocked,
+                'is_blocked_by'  => true,
+            ];
+        }
 
         return [
             'id'              => $user->id,
@@ -24,13 +41,15 @@ class PublicProfileResource extends JsonResource
             'following_count' => $profile->following_count,
             'rotations_count' => $profile->rotations_count,
             'takes_count'     => $profile->takes_count,
-            'is_following'    => Auth::check() && Auth::id() !== $user->id
+            'is_following'    => $isOther
                 ? $request->user()->isFollowing($user->id)
                 : false,
-            'is_followed_by'  => Auth::check() && Auth::id() !== $user->id
+            'is_followed_by'  => $isOther
                 ? $user->isFollowing(Auth::id())
                 : false,
             'is_own_profile'  => Auth::check() && Auth::id() === $user->id,
+            'is_blocked'      => $isBlocked,
+            'is_blocked_by'   => false,
             'header_album'    => $this->formatHeaderAlbum($profile),
             'pinned_rotation' => $this->formatPinnedRotation($profile),
             'current_vibe'    => $this->formatCurrentVibe($profile),

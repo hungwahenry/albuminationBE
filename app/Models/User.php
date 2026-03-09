@@ -81,6 +81,34 @@ class User extends Authenticatable
         return $this->followers()->where('follower_id', $userId)->exists();
     }
 
+    public function blocks(): HasMany
+    {
+        return $this->hasMany(Block::class, 'user_id');
+    }
+
+    public function blockedBy(): HasMany
+    {
+        return $this->hasMany(Block::class, 'blocked_user_id');
+    }
+
+    public function hasBlocked(int $userId): bool
+    {
+        if ($this->relationLoaded('blocks')) {
+            return $this->blocks->where('blocked_user_id', $userId)->isNotEmpty();
+        }
+
+        return $this->blocks()->where('blocked_user_id', $userId)->exists();
+    }
+
+    public function isBlockedBy(int $userId): bool
+    {
+        if ($this->relationLoaded('blockedBy')) {
+            return $this->blockedBy->where('user_id', $userId)->isNotEmpty();
+        }
+
+        return $this->blockedBy()->where('user_id', $userId)->exists();
+    }
+
     public function hasCompletedOnboarding(): bool
     {
         return $this->onboarding_completed_at !== null;

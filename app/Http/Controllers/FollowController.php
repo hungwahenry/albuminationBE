@@ -31,6 +31,10 @@ class FollowController extends Controller
             return $this->error('You cannot follow yourself', 422);
         }
 
+        if ($request->user()->hasBlocked($target->id) || $target->hasBlocked($request->user()->id)) {
+            return $this->error('Cannot follow this user', 403);
+        }
+
         $isFollowing = $this->followService->toggleFollow($request->user(), $target);
 
         return $this->success([
@@ -116,6 +120,30 @@ class FollowController extends Controller
                 'per_page'     => $following->perPage(),
                 'total'        => $following->total(),
             ],
+        ]);
+    }
+
+    /**
+     * Remove a follower from your own followers list.
+     */
+    public function removeFollower(Request $request, string $username): JsonResponse
+    {
+        $profile = Profile::where('username', $username)->first();
+
+        if (!$profile) {
+            return $this->error('User not found', 404);
+        }
+
+        $follower = $profile->user;
+
+        if ($request->user()->id === $follower->id) {
+            return $this->error('You cannot remove yourself', 422);
+        }
+
+        $this->followService->removeFollower($request->user(), $follower);
+
+        return $this->success([
+            'followers_count' => $request->user()->profile->fresh()->followers_count,
         ]);
     }
 }

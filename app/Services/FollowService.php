@@ -31,4 +31,16 @@ class FollowService
 
         return true;
     }
+
+    public function removeFollower(User $user, User $follower): void
+    {
+        $deleted = Follow::where('follower_id', $follower->id)
+            ->where('following_id', $user->id)
+            ->delete();
+
+        if ($deleted) {
+            $user->profile->decrement('followers_count');
+            $follower->profile->decrement('following_count');
+        }
+    }
 }

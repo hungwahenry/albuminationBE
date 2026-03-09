@@ -17,6 +17,7 @@ use App\Http\Controllers\TrackFavouriteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileCustomizationController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UsernameController;
 use Illuminate\Support\Facades\Route;
 
@@ -99,6 +100,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Profile
         Route::put('/profile', [ProfileController::class, 'update']);
+        Route::delete('/profile/followers/{username}', [FollowController::class, 'removeFollower']);
 
         // Profile Customization
         Route::prefix('profile/customization')->group(function () {
@@ -115,6 +117,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/follow', [FollowController::class, 'toggle']);
             Route::get('/followers', [FollowController::class, 'followers']);
             Route::get('/following', [FollowController::class, 'following']);
+            Route::post('/block', [BlockController::class, 'store']);
+            Route::delete('/block', [BlockController::class, 'destroy']);
         });
     });
 });
