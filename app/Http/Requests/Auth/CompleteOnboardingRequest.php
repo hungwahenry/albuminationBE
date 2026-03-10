@@ -17,6 +17,9 @@ class CompleteOnboardingRequest extends FormRequest
             'username' => ['required', 'string', 'min:4', 'max:32', 'regex:/^[a-zA-Z0-9_]+$/', 'unique:profiles,username'],
             'display_name' => ['required', 'string', 'max:255'],
             'avatar' => ['nullable', 'image', 'max:2048'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'place_name' => ['nullable', 'string', 'max:255'],
         ];
     }
 
