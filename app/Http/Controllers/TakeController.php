@@ -11,6 +11,7 @@ use App\Services\TakeService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TakeController extends Controller
 {
@@ -63,9 +64,7 @@ class TakeController extends Controller
             return $this->error('Take not found', 404);
         }
 
-        if ($take->user_id !== $request->user()->id) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('update', $take);
 
         $take = $this->takeService->update($take, $request->rating, $request->body);
 
@@ -80,9 +79,7 @@ class TakeController extends Controller
             return $this->error('Take not found', 404);
         }
 
-        if ($take->user_id !== $request->user()->id) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('delete', $take);
 
         $this->takeService->delete($take);
 

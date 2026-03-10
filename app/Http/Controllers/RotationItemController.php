@@ -11,6 +11,7 @@ use App\Services\RotationItemService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RotationItemController extends Controller
 {
@@ -20,9 +21,7 @@ class RotationItemController extends Controller
 
     public function store(AddRotationItemRequest $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('addItem', $rotation);
 
         $item = $rotation->type === 'album'
             ? $this->service->addAlbum($rotation, $request->validated('mbid'))
@@ -33,9 +32,7 @@ class RotationItemController extends Controller
 
     public function destroy(Request $request, Rotation $rotation, RotationItem $item): JsonResponse
     {
-        if (!$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('removeItem', $rotation);
 
         if ($item->rotation_id !== $rotation->id) {
             return $this->error('Item not found', 404);
@@ -48,9 +45,7 @@ class RotationItemController extends Controller
 
     public function reorder(ReorderRotationItemsRequest $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('reorder', $rotation);
 
         $this->service->reorder($rotation, $request->validated('ordered_ids'));
 

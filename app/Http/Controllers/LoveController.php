@@ -11,6 +11,7 @@ use App\Services\LoveService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class LoveController extends Controller
 {
@@ -44,9 +45,7 @@ class LoveController extends Controller
 
     public function toggleRotation(Request $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->isPublished() && !$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Rotation not found', 404);
-        }
+        Gate::authorize('love', $rotation);
 
         $result = $this->loveService->toggle($request->user(), $rotation);
 

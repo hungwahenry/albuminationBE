@@ -13,6 +13,7 @@ use App\Services\RotationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RotationController extends Controller
 {
@@ -81,9 +82,7 @@ class RotationController extends Controller
 
     public function show(Request $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->is_public && !$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Rotation not found', 404);
-        }
+        Gate::authorize('view', $rotation);
 
         $rotation->load($this->eagerLoadFor($rotation));
 
@@ -92,9 +91,7 @@ class RotationController extends Controller
 
     public function update(UpdateRotationRequest $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('update', $rotation);
 
         $rotation = $this->service->update($rotation, $request->validated());
 
@@ -103,9 +100,7 @@ class RotationController extends Controller
 
     public function destroy(Request $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('delete', $rotation);
 
         $this->service->delete($rotation);
 
@@ -114,9 +109,7 @@ class RotationController extends Controller
 
     public function publish(Request $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('publish', $rotation);
 
         if ($rotation->isPublished()) {
             return $this->error('Rotation is already published', 422);
@@ -133,9 +126,7 @@ class RotationController extends Controller
 
     public function redraft(Request $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('redraft', $rotation);
 
         if ($rotation->isDraft()) {
             return $this->error('Rotation is already a draft', 422);

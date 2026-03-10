@@ -11,6 +11,7 @@ use App\Services\TakeReplyService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TakeReplyController extends Controller
 {
@@ -50,9 +51,7 @@ class TakeReplyController extends Controller
             return $this->error('Reply not found', 404);
         }
 
-        if ($reply->user_id !== $request->user()->id) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('delete', $reply);
 
         $this->replyService->delete($reply);
 

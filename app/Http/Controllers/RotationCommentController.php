@@ -11,6 +11,7 @@ use App\Services\RotationCommentService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RotationCommentController extends Controller
 {
@@ -53,9 +54,7 @@ class RotationCommentController extends Controller
 
     public function store(StoreRotationCommentRequest $request, Rotation $rotation): JsonResponse
     {
-        if (!$rotation->isPublished() && !$rotation->isOwnedBy($request->user()->id)) {
-            return $this->error('Rotation not found', 404);
-        }
+        Gate::authorize('comment', $rotation);
 
         $replyToUserId = null;
         if (!empty($request->reply_to_username)) {
@@ -80,9 +79,7 @@ class RotationCommentController extends Controller
             return $this->error('Comment not found', 404);
         }
 
-        if ($comment->user_id !== $request->user()->id) {
-            return $this->error('Forbidden', 403);
-        }
+        Gate::authorize('delete', $comment);
 
         $this->commentService->delete($comment);
 
