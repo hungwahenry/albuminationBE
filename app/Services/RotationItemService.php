@@ -7,6 +7,7 @@ use App\Models\Rotation;
 use App\Models\RotationItem;
 use App\Models\Track;
 use App\Services\MusicBrainz\MusicBrainzService;
+use Illuminate\Support\Facades\DB;
 
 class RotationItemService
 {
@@ -33,16 +34,18 @@ class RotationItemService
             abort(422, 'Rotation has reached the maximum of ' . self::MAX_ITEMS . ' items');
         }
 
-        $position = $rotation->items()->max('position') + 1;
+        return DB::transaction(function () use ($rotation, $album) {
+            $position = $rotation->items()->max('position') + 1;
 
-        $item = $rotation->items()->create([
-            'album_id' => $album->id,
-            'position' => $position,
-        ]);
+            $item = $rotation->items()->create([
+                'album_id' => $album->id,
+                'position' => $position,
+            ]);
 
-        $rotation->increment('items_count');
+            $rotation->increment('items_count');
 
-        return $item->load('album.artists');
+            return $item->load('album.artists');
+        });
     }
 
     public function addTrack(Rotation $rotation, string $mbid): RotationItem
@@ -65,28 +68,32 @@ class RotationItemService
             abort(422, 'Rotation has reached the maximum of ' . self::MAX_ITEMS . ' items');
         }
 
-        $position = $rotation->items()->max('position') + 1;
+        return DB::transaction(function () use ($rotation, $track) {
+            $position = $rotation->items()->max('position') + 1;
 
-        $item = $rotation->items()->create([
-            'track_id' => $track->id,
-            'position' => $position,
-        ]);
+            $item = $rotation->items()->create([
+                'track_id' => $track->id,
+                'position' => $position,
+            ]);
 
-        $rotation->increment('items_count');
+            $rotation->increment('items_count');
 
-        return $item->load('track.artists', 'track.album');
+            return $item->load('track.artists', 'track.album');
+        });
     }
 
     public function remove(Rotation $rotation, RotationItem $item): void
     {
-        $removedPosition = $item->position;
-        $item->delete();
+        DB::transaction(function () use ($rotation, $item) {
+            $removedPosition = $item->position;
+            $item->delete();
 
-        $rotation->items()
-            ->where('position', '>', $removedPosition)
-            ->decrement('position');
+            $rotation->items()
+                ->where('position', '>', $removedPosition)
+                ->decrement('position');
 
-        $rotation->decrement('items_count');
+            $rotation->decrement('items_count');
+        });
     }
 
     public function reorder(Rotation $rotation, array $orderedIds): void

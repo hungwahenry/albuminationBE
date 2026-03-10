@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Profile;
 use App\Models\Rotation;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class RotationService
@@ -13,93 +14,103 @@ class RotationService
 
     public function create(User $user, array $data): Rotation
     {
-        $rotation = $user->rotations()->create([
-            'title' => $data['title'],
-            'caption' => $data['caption'] ?? null,
-            'type' => $data['type'],
-            'is_ranked' => $data['is_ranked'] ?? false,
-            'is_public' => $data['is_public'] ?? true,
-            'status' => 'draft',
-        ]);
+        return DB::transaction(function () use ($user, $data) {
+            $rotation = $user->rotations()->create([
+                'title' => $data['title'],
+                'caption' => $data['caption'] ?? null,
+                'type' => $data['type'],
+                'is_ranked' => $data['is_ranked'] ?? false,
+                'is_public' => $data['is_public'] ?? true,
+                'status' => 'draft',
+            ]);
 
-        if (!empty($data['cover_image'])) {
-            $path = $data['cover_image']->store('rotation-covers', 'public');
-            $rotation->update(['cover_image' => $path]);
-        }
+            if (!empty($data['cover_image'])) {
+                $path = $data['cover_image']->store('rotation-covers', 'public');
+                $rotation->update(['cover_image' => $path]);
+            }
 
-        if (!empty($data['vibetags'])) {
-            $this->vibetagService->sync($rotation, $data['vibetags']);
-        }
+            if (!empty($data['vibetags'])) {
+                $this->vibetagService->sync($rotation, $data['vibetags']);
+            }
 
-        return $rotation->load('vibetags');
+            return $rotation->load('vibetags');
+        });
     }
 
     public function update(Rotation $rotation, array $data): Rotation
     {
-        $rotation->update(array_filter([
-            'title' => $data['title'] ?? null,
-            'caption' => array_key_exists('caption', $data) ? $data['caption'] : null,
-            'is_ranked' => $data['is_ranked'] ?? null,
-            'is_public' => $data['is_public'] ?? null,
-        ], fn ($v) => $v !== null));
+        return DB::transaction(function () use ($rotation, $data) {
+            $rotation->update(array_filter([
+                'title' => $data['title'] ?? null,
+                'caption' => array_key_exists('caption', $data) ? $data['caption'] : null,
+                'is_ranked' => $data['is_ranked'] ?? null,
+                'is_public' => $data['is_public'] ?? null,
+            ], fn ($v) => $v !== null));
 
-        if (!empty($data['cover_image'])) {
-            if ($rotation->cover_image) {
-                Storage::disk('public')->delete($rotation->cover_image);
+            if (!empty($data['cover_image'])) {
+                if ($rotation->cover_image) {
+                    Storage::disk('public')->delete($rotation->cover_image);
+                }
+                $path = $data['cover_image']->store('rotation-covers', 'public');
+                $rotation->update(['cover_image' => $path]);
             }
-            $path = $data['cover_image']->store('rotation-covers', 'public');
-            $rotation->update(['cover_image' => $path]);
-        }
 
-        if (array_key_exists('vibetags', $data)) {
-            $this->vibetagService->sync($rotation, $data['vibetags'] ?? []);
-        }
+            if (array_key_exists('vibetags', $data)) {
+                $this->vibetagService->sync($rotation, $data['vibetags'] ?? []);
+            }
 
-        return $rotation->load('vibetags');
+            return $rotation->load('vibetags');
+        });
     }
 
     public function publish(Rotation $rotation): Rotation
     {
-        $rotation->update([
-            'status' => 'published',
-            'published_at' => now(),
-        ]);
+        return DB::transaction(function () use ($rotation) {
+            $rotation->update([
+                'status' => 'published',
+                'published_at' => now(),
+            ]);
 
-        $rotation->user->profile->increment('rotations_count');
+            $rotation->user->profile->increment('rotations_count');
 
-        return $rotation;
+            return $rotation;
+        });
     }
 
     public function redraft(Rotation $rotation): Rotation
     {
-        $rotation->update([
-            'status' => 'draft',
-            'published_at' => null,
-        ]);
+        return DB::transaction(function () use ($rotation) {
+            $rotation->update([
+                'status' => 'draft',
+                'published_at' => null,
+            ]);
 
-        $rotation->user->profile->decrement('rotations_count');
+            $rotation->user->profile->decrement('rotations_count');
 
-        // Clear any profiles that have this rotation pinned
-        Profile::where('pinned_rotation_id', $rotation->id)->update(['pinned_rotation_id' => null]);
+            // Clear any profiles that have this rotation pinned
+            Profile::where('pinned_rotation_id', $rotation->id)->update(['pinned_rotation_id' => null]);
 
-        return $rotation;
+            return $rotation;
+        });
     }
 
     public function delete(Rotation $rotation): void
     {
-        if ($rotation->status === 'published') {
-            $rotation->user->profile->decrement('rotations_count');
-        }
+        DB::transaction(function () use ($rotation) {
+            if ($rotation->status === 'published') {
+                $rotation->user->profile->decrement('rotations_count');
+            }
 
-        // Clear any profiles that have this rotation pinned
-        Profile::where('pinned_rotation_id', $rotation->id)->update(['pinned_rotation_id' => null]);
+            // Clear any profiles that have this rotation pinned
+            Profile::where('pinned_rotation_id', $rotation->id)->update(['pinned_rotation_id' => null]);
 
-        $this->vibetagService->detachAll($rotation);
+            $this->vibetagService->detachAll($rotation);
 
-        if ($rotation->cover_image) {
-            Storage::disk('public')->delete($rotation->cover_image);
-        }
+            if ($rotation->cover_image) {
+                Storage::disk('public')->delete($rotation->cover_image);
+            }
 
-        $rotation->delete();
+            $rotation->delete();
+        });
     }
 }

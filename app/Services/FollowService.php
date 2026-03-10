@@ -4,43 +4,48 @@ namespace App\Services;
 
 use App\Models\Follow;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class FollowService
 {
     public function toggleFollow(User $follower, User $target): bool
     {
-        $existing = Follow::where('follower_id', $follower->id)
-            ->where('following_id', $target->id)
-            ->first();
+        return DB::transaction(function () use ($follower, $target) {
+            $existing = Follow::where('follower_id', $follower->id)
+                ->where('following_id', $target->id)
+                ->first();
 
-        if ($existing) {
-            $existing->delete();
-            $target->profile->decrement('followers_count');
-            $follower->profile->decrement('following_count');
+            if ($existing) {
+                $existing->delete();
+                $target->profile->decrement('followers_count');
+                $follower->profile->decrement('following_count');
 
-            return false;
-        }
+                return false;
+            }
 
-        Follow::create([
-            'follower_id' => $follower->id,
-            'following_id' => $target->id,
-        ]);
+            Follow::create([
+                'follower_id' => $follower->id,
+                'following_id' => $target->id,
+            ]);
 
-        $target->profile->increment('followers_count');
-        $follower->profile->increment('following_count');
+            $target->profile->increment('followers_count');
+            $follower->profile->increment('following_count');
 
-        return true;
+            return true;
+        });
     }
 
     public function removeFollower(User $user, User $follower): void
     {
-        $deleted = Follow::where('follower_id', $follower->id)
-            ->where('following_id', $user->id)
-            ->delete();
+        DB::transaction(function () use ($user, $follower) {
+            $deleted = Follow::where('follower_id', $follower->id)
+                ->where('following_id', $user->id)
+                ->delete();
 
-        if ($deleted) {
-            $user->profile->decrement('followers_count');
-            $follower->profile->decrement('following_count');
-        }
+            if ($deleted) {
+                $user->profile->decrement('followers_count');
+                $follower->profile->decrement('following_count');
+            }
+        });
     }
 }

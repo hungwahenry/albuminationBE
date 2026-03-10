@@ -6,6 +6,7 @@ use App\Mail\LoginCodeMail;
 use App\Mail\SignupCodeMail;
 use App\Models\MagicCode;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -59,27 +60,29 @@ class AuthService
             return ['valid' => false, 'message' => 'Invalid or expired code.'];
         }
 
-        $isSignup = $magicCode->type === 'signup';
+        return DB::transaction(function () use ($email, $magicCode) {
+            $isSignup = $magicCode->type === 'signup';
 
-        if ($isSignup) {
-            $user = User::create([
-                'email' => $email,
-                'email_verified_at' => now(),
-            ]);
-        } else {
-            $user = User::where('email', $email)->firstOrFail();
-        }
+            if ($isSignup) {
+                $user = User::create([
+                    'email' => $email,
+                    'email_verified_at' => now(),
+                ]);
+            } else {
+                $user = User::where('email', $email)->firstOrFail();
+            }
 
-        // Clean up used code
-        MagicCode::where('email', $email)->delete();
+            // Clean up used code
+            MagicCode::where('email', $email)->delete();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-        return [
-            'valid' => true,
-            'user' => $user,
-            'token' => $token,
-            'is_new_user' => $isSignup,
-        ];
+            return [
+                'valid' => true,
+                'user' => $user,
+                'token' => $token,
+                'is_new_user' => $isSignup,
+            ];
+        });
     }
 }

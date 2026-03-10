@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Vibetag;
+use Illuminate\Support\Facades\DB;
 
 class VibetagService
 {
@@ -14,38 +15,40 @@ class VibetagService
      */
     public function sync($rotation, array $tagNames): void
     {
-        $normalized = collect($tagNames)
-            ->map(fn (string $name) => strtolower(trim(ltrim(trim($name), '~'))))
-            ->filter(fn (string $name) => $name !== '')
-            ->unique()
-            ->values();
+        DB::transaction(function () use ($rotation, $tagNames) {
+            $normalized = collect($tagNames)
+                ->map(fn (string $name) => strtolower(trim(ltrim(trim($name), '~'))))
+                ->filter(fn (string $name) => $name !== '')
+                ->unique()
+                ->values();
 
-        $existing = Vibetag::whereIn('name', $normalized)->get()->keyBy('name');
+            $existing = Vibetag::whereIn('name', $normalized)->get()->keyBy('name');
 
-        $ids = [];
-        foreach ($normalized as $name) {
-            if ($existing->has($name)) {
-                $ids[] = $existing[$name]->id;
-            } else {
-                $tag = Vibetag::create(['name' => $name]);
-                $ids[] = $tag->id;
+            $ids = [];
+            foreach ($normalized as $name) {
+                if ($existing->has($name)) {
+                    $ids[] = $existing[$name]->id;
+                } else {
+                    $tag = Vibetag::create(['name' => $name]);
+                    $ids[] = $tag->id;
+                }
             }
-        }
 
-        // Detaching tags — decrement their usage count
-        $detaching = $rotation->vibetags()->whereNotIn('vibetags.id', $ids)->pluck('vibetags.id');
-        if ($detaching->isNotEmpty()) {
-            Vibetag::whereIn('id', $detaching)->where('usage_count', '>', 0)->decrement('usage_count');
-        }
+            // Detaching tags — decrement their usage count
+            $detaching = $rotation->vibetags()->whereNotIn('vibetags.id', $ids)->pluck('vibetags.id');
+            if ($detaching->isNotEmpty()) {
+                Vibetag::whereIn('id', $detaching)->where('usage_count', '>', 0)->decrement('usage_count');
+            }
 
-        // Attaching new tags — increment their usage count
-        $currentIds = $rotation->vibetags()->pluck('vibetags.id')->toArray();
-        $attaching = array_diff($ids, $currentIds);
-        if (!empty($attaching)) {
-            Vibetag::whereIn('id', $attaching)->increment('usage_count');
-        }
+            // Attaching new tags — increment their usage count
+            $currentIds = $rotation->vibetags()->pluck('vibetags.id')->toArray();
+            $attaching = array_diff($ids, $currentIds);
+            if (!empty($attaching)) {
+                Vibetag::whereIn('id', $attaching)->increment('usage_count');
+            }
 
-        $rotation->vibetags()->sync($ids);
+            $rotation->vibetags()->sync($ids);
+        });
     }
 
     /**
@@ -53,10 +56,12 @@ class VibetagService
      */
     public function detachAll($rotation): void
     {
-        $tagIds = $rotation->vibetags()->pluck('vibetags.id');
-        if ($tagIds->isNotEmpty()) {
-            Vibetag::whereIn('id', $tagIds)->where('usage_count', '>', 0)->decrement('usage_count');
-        }
-        $rotation->vibetags()->detach();
+        DB::transaction(function () use ($rotation) {
+            $tagIds = $rotation->vibetags()->pluck('vibetags.id');
+            if ($tagIds->isNotEmpty()) {
+                Vibetag::whereIn('id', $tagIds)->where('usage_count', '>', 0)->decrement('usage_count');
+            }
+            $rotation->vibetags()->detach();
+        });
     }
 }

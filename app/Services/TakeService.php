@@ -18,19 +18,21 @@ class TakeService
             abort(422, 'You have already posted a take on this album.');
         }
 
-        $take = Take::create([
-            'user_id'  => $user->id,
-            'album_id' => $album->id,
-            'rating'   => $rating,
-            'body'     => $body,
-        ]);
+        return DB::transaction(function () use ($user, $album, $rating, $body) {
+            $take = Take::create([
+                'user_id'  => $user->id,
+                'album_id' => $album->id,
+                'rating'   => $rating,
+                'body'     => $body,
+            ]);
 
-        $album->increment('takes_count');
-        $album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
+            $album->increment('takes_count');
+            $album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
 
-        $user->profile->increment('takes_count');
+            $user->profile->increment('takes_count');
 
-        return $take->load('user.profile');
+            return $take->load('user.profile');
+        });
     }
 
     /**
@@ -42,20 +44,22 @@ class TakeService
             abort(422, 'You can only edit your take once.');
         }
 
-        $oldRating = $take->rating;
+        return DB::transaction(function () use ($take, $rating, $body) {
+            $oldRating = $take->rating;
 
-        $take->update([
-            'rating'    => $rating,
-            'body'      => $body,
-            'edited_at' => now(),
-        ]);
+            $take->update([
+                'rating'    => $rating,
+                'body'      => $body,
+                'edited_at' => now(),
+            ]);
 
-        if ($oldRating !== $rating) {
-            $take->album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
-            $take->album->decrement($oldRating === 'hit' ? 'hits_count' : 'misses_count');
-        }
+            if ($oldRating !== $rating) {
+                $take->album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
+                $take->album->decrement($oldRating === 'hit' ? 'hits_count' : 'misses_count');
+            }
 
-        return $take->load('user.profile');
+            return $take->load('user.profile');
+        });
     }
 
     /**
@@ -63,12 +67,14 @@ class TakeService
      */
     public function delete(Take $take): void
     {
-        $take->update(['is_deleted' => true]);
-        $take->album->decrement('takes_count');
-        if ($take->rating) {
-            $take->album->decrement($take->rating === 'hit' ? 'hits_count' : 'misses_count');
-        }
+        DB::transaction(function () use ($take) {
+            $take->update(['is_deleted' => true]);
+            $take->album->decrement('takes_count');
+            if ($take->rating) {
+                $take->album->decrement($take->rating === 'hit' ? 'hits_count' : 'misses_count');
+            }
 
-        $take->user->profile->decrement('takes_count');
+            $take->user->profile->decrement('takes_count');
+        });
     }
 }
