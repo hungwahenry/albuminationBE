@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use App\Services\ExportService;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -136,8 +137,8 @@ class UserResource extends Resource
                     ->trueLabel('Completed')
                     ->falseLabel('Incomplete')
                     ->queries(
-                        true: fn (Builder $q) => $q->whereNotNull('onboarding_completed_at'),
-                        false: fn (Builder $q) => $q->whereNull('onboarding_completed_at'),
+                        true: fn (Builder $query) => $query->whereNotNull('onboarding_completed_at'),
+                        false: fn (Builder $query) => $query->whereNull('onboarding_completed_at'),
                     ),
                 TernaryFilter::make('email_verified')
                     ->label('Email Verified')
@@ -145,15 +146,59 @@ class UserResource extends Resource
                     ->trueLabel('Verified')
                     ->falseLabel('Unverified')
                     ->queries(
-                        true: fn (Builder $q) => $q->whereNotNull('email_verified_at'),
-                        false: fn (Builder $q) => $q->whereNull('email_verified_at'),
+                        true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
+                        false: fn (Builder $query) => $query->whereNull('email_verified_at'),
                     ),
                 Filter::make('has_content')
                     ->label('Has Content')
-                    ->query(fn (Builder $q) => $q->whereHas('takes')->orWhereHas('rotations')),
+                    ->query(fn (Builder $query) => $query->whereHas('takes')->orWhereHas('rotations')),
             ])
             ->actions([
                 ViewAction::make(),
+                Action::make('impersonate')
+                    ->label('Impersonate')
+                    ->icon('heroicon-o-user-circle')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->modalDescription('This generates a short-lived API token for this user. Copy and use it in your API client. It expires in 1 hour.')
+                    ->visible(fn () => auth()->user()->can('users.impersonate'))
+                    ->action(function (User $user) {
+                        $token = $user->createToken(
+                            'admin-impersonation',
+                            ['*'],
+                            now()->addHour()
+                        )->plainTextToken;
+
+                        activity()->causedBy(auth()->user())->performedOn($user)
+                            ->log("Generated impersonation token for user: {$user->email}");
+
+                        Notification::make()
+                            ->title('Impersonation token generated')
+                            ->body($token)
+                            ->warning()
+                            ->persistent()
+                            ->send();
+                    }),
+                Action::make('export_data')
+                    ->label('Export Data')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->modalDescription('Download a full JSON export of this user\'s profile, rotations, and takes.')
+                    ->visible(fn () => auth()->user()->can('compliance.manage'))
+                    ->action(function (User $user) {
+                        $data = app(ExportService::class)->build($user, request());
+                        $filename = 'user-export-' . $user->id . '-' . now()->format('Y-m-d') . '.json';
+
+                        activity()->causedBy(auth()->user())->performedOn($user)
+                            ->log("Exported data for user: {$user->email}");
+
+                        return response()->streamDownload(
+                            fn () => print json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                            $filename,
+                            ['Content-Type' => 'application/json']
+                        );
+                    }),
                 Action::make('revoke_tokens')
                     ->label('Revoke Sessions')
                     ->icon('heroicon-o-lock-closed')
@@ -196,7 +241,7 @@ class UserResource extends Resource
                     }),
             ])
             ->bulkActions([])
-            ->modifyQueryUsing(fn (Builder $q) => $q->with('profile'));
+            ->modifyQueryUsing(fn (Builder $query) => $query->with('profile'));
     }
 
     public static function getRelationManagers(): array

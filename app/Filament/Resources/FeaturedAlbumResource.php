@@ -58,7 +58,7 @@ class FeaturedAlbumResource extends Resource
                 DeleteAction::make()
                     ->visible(fn () => auth()->user()->can('catalog.featured.manage')),
             ])
-            ->modifyQueryUsing(fn ($q) => $q->with(['album.artists']));
+            ->modifyQueryUsing(fn (\Illuminate\Database\Eloquent\Builder $query) => $query->with(['album.artists']));
     }
 
     public static function getPages(): array

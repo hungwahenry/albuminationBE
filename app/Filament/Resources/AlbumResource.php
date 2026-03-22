@@ -107,7 +107,7 @@ class AlbumResource extends Resource
                     }),
             ])
             ->bulkActions([])
-            ->modifyQueryUsing(fn ($q) => $q->with('artists'));
+            ->modifyQueryUsing(fn (\Illuminate\Database\Eloquent\Builder $query) => $query->with('artists'));
     }
 
     public static function getPages(): array

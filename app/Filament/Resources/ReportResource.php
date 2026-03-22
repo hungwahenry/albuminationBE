@@ -17,7 +17,6 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -197,7 +196,7 @@ class ReportResource extends Resource
                         ->action(fn (Collection $records) => $records->each->update(['status' => 'dismissed'])),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $q) => $q->with(['user.profile', 'reason']));
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user.profile', 'reason']));
     }
 
     public static function getRelationManagers(): array

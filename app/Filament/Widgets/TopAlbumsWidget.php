@@ -16,11 +16,7 @@ class TopAlbumsWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Album::with('artists')
-                    ->orderByDesc('takes_count')
-                    ->limit(10)
-            )
+            ->query(fn () => Album::with('artists')->orderByDesc('takes_count')->limit(10))
             ->columns([
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('artists_string')
