@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateNotificationPreferenceRequest;
+use App\Models\NotificationType;
 use App\Models\UserNotificationPreference;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -15,8 +16,12 @@ class NotificationPreferenceController extends Controller
     public function show(Request $request): JsonResponse
     {
         $preferences = UserNotificationPreference::firstOrCreate(['user_id' => $request->user()->id]);
+        $types = NotificationType::active()->get(['key', 'label', 'description']);
 
-        return $this->success($preferences->toArray());
+        return $this->success([
+            'types'       => $types,
+            'preferences' => $preferences->toArray(),
+        ]);
     }
 
     public function update(UpdateNotificationPreferenceRequest $request): JsonResponse
@@ -25,6 +30,11 @@ class NotificationPreferenceController extends Controller
 
         $preferences->fill($request->validated())->save();
 
-        return $this->success($preferences->toArray());
+        $types = NotificationType::active()->get(['key', 'label', 'description']);
+
+        return $this->success([
+            'types'       => $types,
+            'preferences' => $preferences->toArray(),
+        ]);
     }
 }
