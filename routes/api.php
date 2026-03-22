@@ -21,6 +21,8 @@ use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UsernameController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +45,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/user', [AuthController::class, 'user']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/username/check', [UsernameController::class, 'check']);
+
+    // Account settings (email change, delete account)
+    Route::prefix('account')->group(function () {
+        Route::post('/email/send-code', [AccountController::class, 'sendEmailChangeCode'])->middleware('throttle:5,1');
+        Route::post('/email/verify', [AccountController::class, 'verifyEmailChange']);
+        Route::delete('/', [AccountController::class, 'deleteAccount']);
+    });
+
+    // Data export
+    Route::get('/account/export', ExportController::class);
 
     // Routes requiring completed onboarding
     Route::middleware('onboarding')->group(function () {
