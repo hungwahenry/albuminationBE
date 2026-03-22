@@ -16,6 +16,7 @@ use App\Http\Controllers\TakeReplyController;
 use App\Http\Controllers\TrackFavouriteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileCustomizationController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DeviceTokenController;
@@ -46,6 +47,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Routes requiring completed onboarding
     Route::middleware('onboarding')->group(function () {
         Route::get('/search', SearchController::class);
+
+        // Feed
+        Route::prefix('feed')->group(function () {
+            Route::get('/sections', [FeedController::class, 'sections']);
+            Route::get('/sections/{type}', [FeedController::class, 'sectionData']);
+        });
 
         // Giphy proxy
         Route::prefix('giphy')->group(function () {
