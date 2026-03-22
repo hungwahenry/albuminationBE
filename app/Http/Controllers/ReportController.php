@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Resources\ReportReasonResource;
 use App\Http\Resources\ReportResource;
+use App\Models\User;
 use App\Services\ReportService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -16,9 +17,6 @@ class ReportController extends Controller
 
     public function __construct(private ReportService $service) {}
 
-    /**
-     * Get report reasons for a given reportable type.
-     */
     public function reasons(Request $request): JsonResponse
     {
         $request->validate([
@@ -31,9 +29,6 @@ class ReportController extends Controller
         return $this->success(ReportReasonResource::collection($reasons));
     }
 
-    /**
-     * Store a new report.
-     */
     public function store(StoreReportRequest $request): JsonResponse
     {
         $reportable = $this->service->resolveReportable(
@@ -42,7 +37,7 @@ class ReportController extends Controller
         );
 
         // Prevent self-reporting
-        $ownerId = $reportable instanceof \App\Models\User
+        $ownerId = $reportable instanceof User
             ? $reportable->id
             : ($reportable->user_id ?? null);
 

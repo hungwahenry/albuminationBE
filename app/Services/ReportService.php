@@ -4,18 +4,23 @@ namespace App\Services;
 
 use App\Models\Report;
 use App\Models\ReportReason;
+use App\Models\Rotation;
+use App\Models\RotationComment;
+use App\Models\Take;
+use App\Models\TakeReply;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
 class ReportService
 {
     private const REPORTABLE_TYPES = [
-        'rotation'         => \App\Models\Rotation::class,
-        'take'             => \App\Models\Take::class,
-        'take_reply'       => \App\Models\TakeReply::class,
-        'rotation_comment' => \App\Models\RotationComment::class,
-        'user'             => \App\Models\User::class,
+        'rotation'         => Rotation::class,
+        'take'             => Take::class,
+        'take_reply'       => TakeReply::class,
+        'rotation_comment' => RotationComment::class,
+        'user'             => User::class,
     ];
 
     public function resolveReportable(string $type, int $id): Model
@@ -46,7 +51,7 @@ class ReportService
         ]);
     }
 
-    public function getReasons(string $reportableType): \Illuminate\Database\Eloquent\Collection
+    public function getReasons(string $reportableType): Collection
     {
         return ReportReason::active()
             ->forType($reportableType)

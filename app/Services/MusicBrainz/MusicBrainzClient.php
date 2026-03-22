@@ -2,6 +2,8 @@
 
 namespace App\Services\MusicBrainz;
 
+use GuzzleHttp\Handler\StreamHandler;
+use GuzzleHttp\HandlerStack;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
@@ -96,7 +98,7 @@ class MusicBrainzClient
             'User-Agent' => $this->userAgent,
             'Accept' => 'application/json',
         ])->withOptions([
-            'handler' => \GuzzleHttp\HandlerStack::create(new \GuzzleHttp\Handler\StreamHandler()),
+            'handler' => HandlerStack::create(new StreamHandler()),
         ])->timeout(10)->retry(2, 500);
     }
 }
