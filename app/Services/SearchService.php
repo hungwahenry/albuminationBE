@@ -65,6 +65,7 @@ class SearchService
             ->get()
             ->map(fn (Artist $artist) => [
                 'mbid'           => $artist->mbid,
+                'slug'           => $artist->slug,
                 'name'           => $artist->name,
                 'type'           => $artist->type,
                 'country'        => $artist->country,
@@ -91,6 +92,7 @@ class SearchService
                 'cover_art_url' => $album->cover_art_url,
                 'artists'       => $album->artists->map(fn (Artist $a) => [
                     'mbid'        => $a->mbid,
+                    'slug'        => $a->slug,
                     'name'        => $a->name,
                     'join_phrase' => $a->pivot->join_phrase,
                 ])->all(),
@@ -119,6 +121,7 @@ class SearchService
                 ] : null,
                 'artists' => $track->artists->map(fn (Artist $a) => [
                     'mbid'        => $a->mbid,
+                    'slug'        => $a->slug,
                     'name'        => $a->name,
                     'join_phrase' => $a->pivot->join_phrase,
                 ])->all(),

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -23,6 +24,8 @@ class Artist extends Model
         'begin_date',
         'end_date',
         'image_url',
+        'stans_count',
+        'albums_synced_at',
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -38,6 +41,7 @@ class Artist extends Model
         return [
             'begin_date' => 'date',
             'end_date' => 'date',
+            'albums_synced_at' => 'datetime',
         ];
     }
 
@@ -61,5 +65,15 @@ class Artist extends Model
         return $this->belongsToMany(Track::class)
             ->withPivot(['join_phrase', 'order'])
             ->orderByPivot('order');
+    }
+
+    public function stans(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'artist_stans');
+    }
+
+    public function isStannedBy(int $userId): bool
+    {
+        return $this->stans()->where('user_id', $userId)->exists();
     }
 }

@@ -17,6 +17,7 @@ use App\Http\Controllers\TrackFavouriteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileCustomizationController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DeviceTokenController;
@@ -72,6 +73,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/trending', [GiphyController::class, 'trending']);
             Route::get('/search', [GiphyController::class, 'search']);
         });
+        Route::get('/artists/{slug}', [ArtistController::class, 'show']);
+        Route::post('/artists/{slug}/stan', [ArtistController::class, 'stan']);
+
         Route::get('/albums/{mbid}', [AlbumController::class, 'show']);
         Route::post('/albums/{mbid}/love', [LoveController::class, 'toggleAlbum']);
         Route::post('/albums/{mbid}/tracks/{track}/favourite', [TrackFavouriteController::class, 'toggle']);

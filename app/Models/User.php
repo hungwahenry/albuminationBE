@@ -103,6 +103,11 @@ class User extends Authenticatable
         return $this->hasMany(Report::class);
     }
 
+    public function stannedArtists(): BelongsToMany
+    {
+        return $this->belongsToMany(Artist::class, 'artist_stans');
+    }
+
     public function reportsAgainst(): MorphMany
     {
         return $this->morphMany(Report::class, 'reportable');
