@@ -9,6 +9,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -96,6 +97,50 @@ class UserResource extends Resource
                         ->state(fn (User $u) => $u->reports()->count()),
                 ]),
             ]),
+
+            Section::make('Notification Preferences')
+                ->collapsed()
+                ->schema([
+                    Grid::make(4)->schema([
+                        TextEntry::make('prefs_header_in_app')->label('')->state('In-App')->weight(\Filament\Support\Enums\FontWeight::Bold),
+                        TextEntry::make('prefs_header_push')->label('')->state('Push')->weight(\Filament\Support\Enums\FontWeight::Bold),
+                        TextEntry::make('prefs_header_mail')->label('')->state('Email')->weight(\Filament\Support\Enums\FontWeight::Bold),
+                        TextEntry::make('prefs_header_label')->label('')->state('Channel →')->weight(\Filament\Support\Enums\FontWeight::Bold),
+                    ]),
+                    ...collect([
+                        'new_follower'       => 'New Follower',
+                        'like_content'       => 'Likes',
+                        'reaction'           => 'Reactions',
+                        'comment_content'    => 'Comments',
+                        'reply_content'      => 'Replies',
+                        'rotation_published' => 'Rotation Published',
+                        'report_updates'     => 'Report Updates',
+                    ])->map(fn (string $label, string $key) =>
+                        Grid::make(4)->schema([
+                            IconEntry::make("notificationPreferences.{$key}_in_app")
+                                ->label('')
+                                ->boolean()
+                                ->trueColor('success')
+                                ->falseColor('danger')
+                                ->placeholder('—'),
+                            IconEntry::make("notificationPreferences.{$key}_push")
+                                ->label('')
+                                ->boolean()
+                                ->trueColor('success')
+                                ->falseColor('danger')
+                                ->placeholder('—'),
+                            IconEntry::make("notificationPreferences.{$key}_mail")
+                                ->label('')
+                                ->boolean()
+                                ->trueColor('success')
+                                ->falseColor('danger')
+                                ->placeholder('—'),
+                            TextEntry::make("notificationPreferences.{$key}_label")
+                                ->label('')
+                                ->state($label),
+                        ])
+                    )->values()->all(),
+                ]),
         ]);
     }
 
@@ -250,6 +295,8 @@ class UserResource extends Resource
             \App\Filament\Resources\UserResource\RelationManagers\TakesRelationManager::class,
             \App\Filament\Resources\UserResource\RelationManagers\RotationsRelationManager::class,
             \App\Filament\Resources\UserResource\RelationManagers\ReportsRelationManager::class,
+            \App\Filament\Resources\UserResource\RelationManagers\ReportsAgainstRelationManager::class,
+            \App\Filament\Resources\UserResource\RelationManagers\TokensRelationManager::class,
         ];
     }
 

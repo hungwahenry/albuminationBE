@@ -18,6 +18,7 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -82,6 +83,10 @@ class RotationResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('cover_image')
+                    ->label('')
+                    ->disk('public')
+                    ->size(48),
                 TextColumn::make('id')->sortable(),
                 TextColumn::make('user.profile.username')->label('Author')->searchable(),
                 TextColumn::make('title')->searchable()->limit(40),

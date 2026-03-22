@@ -4,15 +4,18 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ArtistResource\Pages;
 use App\Models\Artist;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -30,6 +33,19 @@ class ArtistResource extends Resource
                 ->label('Image URL')
                 ->url()
                 ->nullable()
+                ->helperText('Paste an external URL, or upload a file below.')
+                ->columnSpanFull(),
+
+            FileUpload::make('image_file')
+                ->label('Upload Image')
+                ->disk('public')
+                ->directory('artists')
+                ->image()
+                ->imagePreviewHeight('160')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                ->maxSize(4096)
+                ->nullable()
+                ->helperText('Uploading a file will replace the URL above.')
                 ->columnSpanFull(),
         ]);
     }
@@ -51,6 +67,10 @@ class ArtistResource extends Resource
                 ]),
                 Grid::make(1)->schema([
                     TextEntry::make('image_url')->label('Image URL')->placeholder('—')->copyable(),
+                    ImageEntry::make('image_url')
+                        ->label('Preview')
+                        ->height(160)
+                        ->visible(fn (Artist $record) => filled($record->image_url)),
                 ]),
             ]),
 
@@ -71,6 +91,11 @@ class ArtistResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('image_url')
+                    ->label('')
+                    ->size(48)
+                    ->circular()
+                    ->defaultImageUrl(fn () => null),
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('type')->placeholder('—'),
                 TextColumn::make('country')->placeholder('—'),

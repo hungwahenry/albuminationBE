@@ -14,6 +14,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -71,6 +72,10 @@ class AlbumResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('cover_art_url')
+                    ->label('')
+                    ->size(48)
+                    ->state(fn (Album $a) => $a->mbid ? $a->cover_art_url : null),
                 TextColumn::make('title')->searchable()->sortable(),
                 TextColumn::make('artists_string')
                     ->label('Artists')
