@@ -66,7 +66,7 @@ class PublicProfileResource extends JsonResource
             'id'            => $album->id,
             'mbid'          => $album->mbid,
             'title'         => $album->title,
-            'artist_name'   => $album->artists->pluck('name')->join(', '),
+            'artist_name'   => $album->artists->map(fn ($a) => $a->name . ($a->pivot->join_phrase ?? ''))->join(''),
             'cover_art_url' => $album->cover_art_url,
         ];
     }
@@ -92,7 +92,7 @@ class PublicProfileResource extends JsonResource
         if (!$vibe) return null;
 
         $type = $profile->current_vibe_type === 'App\\Models\\Album' ? 'album' : 'track';
-        $artistName = $vibe->artists->pluck('name')->join(', ');
+        $artistName = $vibe->artists->map(fn ($a) => $a->name . ($a->pivot->join_phrase ?? ''))->join('');
 
         return [
             'type'          => $type,

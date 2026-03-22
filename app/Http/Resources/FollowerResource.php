@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class FollowerResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id'             => $this->id,
+            'username'       => $this->profile->username,
+            'display_name'   => $this->profile->display_name,
+            'avatar'         => $this->profile->avatar,
+            'is_following'   => $request->user()->isFollowing($this->id),
+            'is_followed_by' => $this->isFollowing($request->user()->id),
+        ];
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ListNotificationsRequest;
 use App\Http\Resources\NotificationResource;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -11,23 +12,17 @@ class NotificationController extends Controller
 {
     use ApiResponse;
 
-    public function index(Request $request): JsonResponse
+    public function index(ListNotificationsRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'unread_only' => ['sometimes', 'boolean'],
-            'page' => ['sometimes', 'integer', 'min:1'],
-            'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
-        ]);
-
         $user = $request->user();
 
         $query = $user->notifications()->latest('created_at');
 
-        if (!empty($validated['unread_only'])) {
+        if ($request->boolean('unread_only')) {
             $query->whereNull('read_at');
         }
 
-        $perPage = $validated['per_page'] ?? 20;
+        $perPage = $request->validated('per_page', 20);
         $notifications = $query->paginate($perPage);
 
         return $this->success(

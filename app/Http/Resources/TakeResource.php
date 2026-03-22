@@ -23,7 +23,7 @@ class TakeResource extends JsonResource
                     'id'            => $this->album->id,
                     'mbid'          => $this->album->mbid,
                     'title'         => $this->album->title,
-                    'artist_name'   => $this->album->artists->pluck('name')->join(', '),
+                    'artist_name'   => $this->album->artists->map(fn ($a) => $a->name . ($a->pivot->join_phrase ?? ''))->join(''),
                     'cover_art_url' => $this->album->cover_art_url,
                 ];
             }),

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SetCurrentVibeRequest;
+use App\Http\Requests\SetHeaderAlbumRequest;
+use App\Http\Requests\SetPinnedRotationRequest;
 use App\Http\Resources\PublicProfileResource;
 use App\Models\Rotation;
 use App\Services\ProfileCustomizationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ProfileCustomizationController extends Controller
 {
@@ -15,24 +17,16 @@ class ProfileCustomizationController extends Controller
 
     public function __construct(private ProfileCustomizationService $service) {}
 
-    public function setHeaderAlbum(Request $request): JsonResponse
+    public function setHeaderAlbum(SetHeaderAlbumRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'mbid' => ['nullable', 'string', 'max:36'],
-        ]);
-
-        $user = $this->service->setHeaderAlbum($request->user(), $data['mbid'] ?? null);
+        $user = $this->service->setHeaderAlbum($request->user(), $request->validated('mbid'));
 
         return $this->success(new PublicProfileResource($user));
     }
 
-    public function setPinnedRotation(Request $request): JsonResponse
+    public function setPinnedRotation(SetPinnedRotationRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'rotation_id' => ['nullable', 'integer'],
-        ]);
-
-        $rotationId = $data['rotation_id'] ?? null;
+        $rotationId = $request->validated('rotation_id');
 
         if ($rotationId) {
             $rotation = Rotation::find($rotationId);
@@ -51,17 +45,12 @@ class ProfileCustomizationController extends Controller
         return $this->success(new PublicProfileResource($user));
     }
 
-    public function setCurrentVibe(Request $request): JsonResponse
+    public function setCurrentVibe(SetCurrentVibeRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'type' => ['nullable', 'string', 'in:album,track'],
-            'mbid' => ['nullable', 'string', 'max:36'],
-        ]);
-
         $user = $this->service->setCurrentVibe(
             $request->user(),
-            $data['type'] ?? null,
-            $data['mbid'] ?? null,
+            $request->validated('type'),
+            $request->validated('mbid'),
         );
 
         return $this->success(new PublicProfileResource($user));

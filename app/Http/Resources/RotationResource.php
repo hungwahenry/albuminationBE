@@ -24,6 +24,7 @@ class RotationResource extends JsonResource
             'loves_count'     => $this->loves_count,
             'comments_count'  => $this->comments_count,
             'is_loved'        => Auth::check() ? $this->isLovedBy(Auth::id()) : false,
+            'is_mine'         => Auth::id() === $this->user_id,
             'published_at'    => $this->published_at?->toISOString(),
             'created_at'      => $this->created_at->toISOString(),
             'user'            => [
