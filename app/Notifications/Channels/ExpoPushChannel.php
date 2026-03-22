@@ -27,7 +27,11 @@ class ExpoPushChannel
             : [];
 
         $title = $payload['title'] ?? 'Albumination';
-        $body = $payload['body'] ?? ($payload['message'] ?? '');
+        $actorName = $payload['actor']['display_name']
+            ?? $payload['actor']['username']
+            ?? null;
+        $message = $payload['message'] ?? '';
+        $body = $payload['body'] ?? ($actorName && $message ? "{$actorName} {$message}" : $message);
         $data = $payload['data'] ?? $payload;
 
         if ($body === '') {
