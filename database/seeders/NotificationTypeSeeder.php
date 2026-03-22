@@ -46,10 +46,17 @@ class NotificationTypeSeeder extends Seeder
                 'is_active'   => true,
             ],
             [
+                'key'         => 'reaction',
+                'label'       => 'Reactions',
+                'description' => 'When someone agrees or disagrees with your take',
+                'sort_order'  => 5,
+                'is_active'   => true,
+            ],
+            [
                 'key'         => 'report_updates',
                 'label'       => 'Report updates',
-                'description' => 'Status updates on reports',
-                'sort_order'  => 5,
+                'description' => 'Status updates on reports you submitted',
+                'sort_order'  => 6,
                 'is_active'   => true,
             ],
         ];

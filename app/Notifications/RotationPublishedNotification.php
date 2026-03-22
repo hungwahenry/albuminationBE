@@ -48,6 +48,7 @@ class RotationPublishedNotification extends Notification implements ShouldQueue
         return [
             'type' => 'rotation_published',
             'rotation_id' => $this->rotation->id,
+            'rotation_slug' => $this->rotation->slug,
             'rotation_title' => $this->rotation->title,
             'actor_id' => $this->author->id,
             'actor' => [

@@ -4,12 +4,14 @@ namespace App\Providers;
 
 use App\Events\ContentLoved;
 use App\Events\FollowCreated;
+use App\Events\ReportResolved;
 use App\Events\RotationCommentCreated;
 use App\Events\RotationPublished;
 use App\Events\TakeReactionChanged;
 use App\Events\TakeReplyCreated;
 use App\Listeners\SendContentLovedNotifications;
 use App\Listeners\SendFollowNotifications;
+use App\Listeners\SendReportResolvedNotifications;
 use App\Listeners\SendRotationCommentNotifications;
 use App\Listeners\SendRotationPublishedNotifications;
 use App\Listeners\SendTakeReactionNotifications;
@@ -41,6 +43,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         TakeReactionChanged::class => [
             SendTakeReactionNotifications::class,
+        ],
+        ReportResolved::class => [
+            SendReportResolvedNotifications::class,
         ],
     ];
 }

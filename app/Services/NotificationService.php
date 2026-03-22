@@ -6,6 +6,7 @@ use App\Models\Rotation;
 use App\Models\RotationComment;
 use App\Models\Take;
 use App\Models\TakeReply;
+use App\Models\Report;
 use App\Models\User;
 use App\Models\UserNotificationPreference;
 use App\Notifications\CommentOrReplyNotification;
@@ -13,6 +14,7 @@ use App\Notifications\ContentLovedNotification;
 use App\Notifications\GroupedNotificationStore;
 use App\Notifications\NewFollowerNotification;
 use App\Notifications\RotationPublishedNotification;
+use App\Notifications\ReportUpdatedNotification;
 use App\Notifications\TakeReactionNotification;
 use App\Notifications\Channels\ExpoPushChannel;
 use Illuminate\Database\Eloquent\Collection;
@@ -119,34 +121,27 @@ class NotificationService
             return;
         }
 
-        $followers = $this->followersOf($author);
+        User::whereHas('following', function ($q) use ($author) {
+            $q->where('following_id', $author->id);
+        })
+            ->with('profile')
+            ->where('id', '!=', $author->id)
+            ->chunkById(200, function (Collection $chunk) use ($author, $rotation) {
+                foreach ($chunk as $follower) {
+                    if ($follower->hasBlocked($author->id) || $follower->isBlockedBy($author->id)) {
+                        continue;
+                    }
 
-        if ($followers->isEmpty()) {
-            return;
-        }
-
-        foreach ($followers as $follower) {
-            if ($follower->id === $author->id) {
-                continue;
-            }
-
-            if ($follower->hasBlocked($author->id) || $follower->isBlockedBy($author->id)) {
-                continue;
-            }
-
-            $this->notifyWithGrouping(
-                recipient: $follower,
-                notification: new RotationPublishedNotification($author, $rotation),
-                groupKey: "rotation_published:author:{$author->id}",
-                preferencePrefix: 'rotation_published',
-            );
-        }
+                    $this->notifyWithGrouping(
+                        recipient: $follower,
+                        notification: new RotationPublishedNotification($author, $rotation),
+                        groupKey: "rotation_published:author:{$author->id}",
+                        preferencePrefix: 'rotation_published',
+                    );
+                }
+            });
     }
 
-    /**
-     * Generic handler for loves/likes on loveable content.
-     * Supports Rotation, RotationComment, Take, and TakeReply.
-     */
     public function onContentLoved(User $actor, Model $loveable): void
     {
         $owner = ContentLovedNotification::resolveOwner($loveable);
@@ -171,6 +166,22 @@ class NotificationService
         );
     }
 
+    public function onReportResolved(Report $report, string $resolution): void
+    {
+        $reporter = $report->user;
+
+        if (!$reporter) {
+            return;
+        }
+
+        $this->notifyWithGrouping(
+            recipient: $reporter,
+            notification: new ReportUpdatedNotification($report, $resolution),
+            groupKey: "report_updated:report:{$report->id}",
+            preferencePrefix: 'report_updates',
+        );
+    }
+
     public function onTakeReacted(User $actor, Take $take, string $type): void
     {
         if ($take->user_id === $actor->id) {
@@ -183,7 +194,7 @@ class NotificationService
             recipient: $take->user,
             notification: new TakeReactionNotification($actor, $take, $type),
             groupKey: "reactions:take:{$take->id}",
-            preferencePrefix: 'like_content',
+            preferencePrefix: 'reaction',
         );
     }
 
@@ -216,13 +227,4 @@ class NotificationService
         }
     }
 
-    /**
-     * @return Collection<int, User>
-     */
-    private function followersOf(User $user): Collection
-    {
-        return User::whereHas('following', function ($q) use ($user) {
-            $q->where('following_id', $user->id);
-        })->with('profile')->get();
-    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Channels;
 
+use App\Models\DeviceToken;
 use App\Models\User;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
@@ -52,6 +53,30 @@ class ExpoPushChannel
                 'tokens' => $chunk,
                 'status' => $response->status(),
                 'body'   => $response->json(),
+            ]);
+
+            $this->pruneInvalidTokens($chunk, $response->json('data', []));
+        }
+    }
+
+    private function pruneInvalidTokens(array $chunk, array $results): void
+    {
+        $invalidTokens = [];
+
+        foreach ($results as $index => $result) {
+            if (
+                ($result['status'] ?? '') === 'error' &&
+                ($result['details']['error'] ?? '') === 'DeviceNotRegistered'
+            ) {
+                $invalidTokens[] = $chunk[$index];
+            }
+        }
+
+        if (!empty($invalidTokens)) {
+            DeviceToken::whereIn('token', $invalidTokens)->delete();
+
+            Log::channel('stack')->info('ExpoPush pruned invalid tokens', [
+                'tokens' => $invalidTokens,
             ]);
         }
     }
