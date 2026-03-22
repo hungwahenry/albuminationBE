@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BlockedUserResource;
 use App\Models\Profile;
 use App\Services\BlockService;
 use App\Traits\ApiResponse;
@@ -13,6 +14,23 @@ class BlockController extends Controller
     use ApiResponse;
 
     public function __construct(private BlockService $blockService) {}
+
+    public function index(Request $request): JsonResponse
+    {
+        $paginator = $request->user()
+            ->blocks()
+            ->with('blockedUser.profile')
+            ->latest('created_at')
+            ->paginate(30);
+
+        $paginator->setCollection(
+            $paginator->getCollection()->map->blockedUser
+        );
+
+        return $this->success(
+            BlockedUserResource::collection($paginator)->response()->getData(true)
+        );
+    }
 
     public function store(Request $request, string $username): JsonResponse
     {

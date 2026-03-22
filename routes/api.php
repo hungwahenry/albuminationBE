@@ -55,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Data export
     Route::get('/account/export', ExportController::class);
+    Route::get('/account/blocked', [BlockController::class, 'index']);
 
     // Routes requiring completed onboarding
     Route::middleware('onboarding')->group(function () {
@@ -116,6 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Reports
         Route::prefix('reports')->group(function () {
+            Route::get('/', [ReportController::class, 'index']);
             Route::get('/reasons', [ReportController::class, 'reasons']);
             Route::post('/', [ReportController::class, 'store']);
         });

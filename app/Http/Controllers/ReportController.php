@@ -17,6 +17,19 @@ class ReportController extends Controller
 
     public function __construct(private ReportService $service) {}
 
+    public function index(Request $request): JsonResponse
+    {
+        $paginator = $request->user()
+            ->reports()
+            ->with('reason')
+            ->latest()
+            ->paginate(20);
+
+        return $this->success(
+            ReportResource::collection($paginator)->response()->getData(true)
+        );
+    }
+
     public function reasons(Request $request): JsonResponse
     {
         $request->validate([

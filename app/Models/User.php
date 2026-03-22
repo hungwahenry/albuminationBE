@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Reportable;
+use App\Models\Report;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -94,6 +95,11 @@ class User extends Authenticatable
     public function blocks(): HasMany
     {
         return $this->hasMany(Block::class, 'user_id');
+    }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class);
     }
 
     public function blockedBy(): HasMany
