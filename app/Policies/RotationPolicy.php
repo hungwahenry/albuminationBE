@@ -11,8 +11,13 @@ class RotationPolicy
      * Block all interaction when either user has blocked the other.
      * Owner actions on their own rotations are always allowed.
      */
-    public function before(User $user, string $ability, mixed ...$args): ?bool
+    public function before(\Illuminate\Contracts\Auth\Authenticatable $user, string $ability, mixed ...$args): ?bool
     {
+        // Non-app users (e.g. AdminUser) are not subject to block-based rules.
+        if (!$user instanceof User) {
+            return null;
+        }
+
         $rotation = $args[0] ?? null;
 
         if ($rotation instanceof Rotation && $rotation->user_id !== $user->id) {
