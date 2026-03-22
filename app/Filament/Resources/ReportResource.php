@@ -4,8 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Events\ReportResolved;
 use App\Filament\Resources\ReportResource\Pages;
+use App\Filament\Resources\RotationResource;
+use App\Filament\Resources\TakeResource;
+use App\Filament\Resources\UserResource;
 use App\Models\Report;
 use App\Models\ReportReason;
+use App\Models\Rotation;
+use App\Models\Take;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section;
@@ -72,8 +77,14 @@ class ReportResource extends Resource
             Section::make('Reporter')->schema([
                 Grid::make(3)->schema([
                     TextEntry::make('user.id')->label('User ID'),
-                    TextEntry::make('user.email')->label('Email'),
-                    TextEntry::make('user.profile.username')->label('Username'),
+                    TextEntry::make('user.email')->label('Email')
+                        ->url(fn (Report $r) => $r->user_id
+                            ? UserResource::getUrl('view', ['record' => $r->user_id])
+                            : null),
+                    TextEntry::make('user.profile.username')->label('Username')
+                        ->url(fn (Report $r) => $r->user_id
+                            ? UserResource::getUrl('view', ['record' => $r->user_id])
+                            : null),
                 ]),
             ]),
 
@@ -84,14 +95,25 @@ class ReportResource extends Resource
                         $r = $record->reportable;
                         if (!$r) return 'Content no longer exists';
                         return match (true) {
-                            $r instanceof \App\Models\Take           => "Take: {$r->body}",
-                            $r instanceof \App\Models\TakeReply      => "Reply: {$r->body}",
-                            $r instanceof \App\Models\Rotation       => "Rotation: {$r->title}",
+                            $r instanceof \App\Models\Take            => "Take: {$r->body}",
+                            $r instanceof \App\Models\TakeReply       => "Reply: {$r->body}",
+                            $r instanceof \App\Models\Rotation        => "Rotation: {$r->title}",
                             $r instanceof \App\Models\RotationComment => "Comment: {$r->body}",
-                            $r instanceof \App\Models\User           => "User: {$r->email}",
-                            default                                  => 'Unknown content type',
+                            $r instanceof \App\Models\User            => "User: {$r->email}",
+                            default                                   => 'Unknown content type',
                         };
-                    }),
+                    })
+                    ->url(function (Report $record): ?string {
+                        $r = $record->reportable;
+                        if (!$r) return null;
+                        return match (true) {
+                            $r instanceof Take     => TakeResource::getUrl('view', ['record' => $r->id]),
+                            $r instanceof Rotation => RotationResource::getUrl('view', ['record' => $r->id]),
+                            $r instanceof \App\Models\User => UserResource::getUrl('view', ['record' => $r->id]),
+                            default => null,
+                        };
+                    })
+                    ->openUrlInNewTab(),
             ]),
         ]);
     }

@@ -13,9 +13,10 @@ class RotationPolicy
      */
     public function before(\Illuminate\Contracts\Auth\Authenticatable $user, string $ability, mixed ...$args): ?bool
     {
-        // Non-app users (e.g. AdminUser) are not subject to block-based rules.
+        // Non-app users (e.g. AdminUser) short-circuit all policy method checks.
+        // The admin panel's resource canX() methods handle access control instead.
         if (!$user instanceof User) {
-            return null;
+            return true;
         }
 
         $rotation = $args[0] ?? null;

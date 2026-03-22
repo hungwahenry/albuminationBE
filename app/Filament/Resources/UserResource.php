@@ -244,9 +244,13 @@ class UserResource extends Resource
             ->modifyQueryUsing(fn (Builder $query) => $query->with('profile'));
     }
 
-    public static function getRelationManagers(): array
+    public static function getRelations(): array
     {
-        return [];
+        return [
+            \App\Filament\Resources\UserResource\RelationManagers\TakesRelationManager::class,
+            \App\Filament\Resources\UserResource\RelationManagers\RotationsRelationManager::class,
+            \App\Filament\Resources\UserResource\RelationManagers\ReportsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

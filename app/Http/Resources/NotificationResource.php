@@ -14,11 +14,24 @@ class NotificationResource extends JsonResource
         $groupingKeys = ['group_key', 'count', 'actors', 'actor', 'latest_at'];
         $data = array_diff_key($raw, array_flip($groupingKeys));
 
+        $actors = $raw['actors'] ?? array_filter([($raw['actor'] ?? null)]);
+
+        // System notifications (broadcast, report_updated) have no real actor.
+        // Inject a synthetic System actor so the frontend avatar logic is uniform.
+        if (empty($actors)) {
+            $actors = [[
+                'id'           => 0,
+                'username'     => null,
+                'display_name' => 'System',
+                'avatar'       => null,
+            ]];
+        }
+
         return [
             'id'         => $this->id,
             'type'       => $raw['type'] ?? class_basename($this->type),
             'count'      => $raw['count'] ?? 1,
-            'actors'     => $raw['actors'] ?? array_filter([($raw['actor'] ?? null)]),
+            'actors'     => $actors,
             'latest_at'  => $raw['latest_at'] ?? $this->created_at->toISOString(),
             'data'       => $data,
             'read_at'    => $this->read_at?->toISOString(),

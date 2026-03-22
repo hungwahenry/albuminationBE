@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AlbumResource\Pages;
+use App\Filament\Resources\AlbumResource\RelationManagers\TracksRelationManager;
 use App\Models\Album;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
@@ -59,10 +60,8 @@ class AlbumResource extends Resource
 
             Section::make('Catalog Stats')->schema([
                 Grid::make(2)->schema([
-                    TextEntry::make('tracks_count')
-                        ->label('Tracks in Catalog')
-                        ->state(fn (Album $a) => $a->tracks()->count()),
                     TextEntry::make('created_at')->label('Added to Catalog')->dateTime(),
+                    TextEntry::make('updated_at')->label('Last Updated')->dateTime(),
                 ]),
             ]),
         ]);
@@ -108,6 +107,13 @@ class AlbumResource extends Resource
             ])
             ->bulkActions([])
             ->modifyQueryUsing(fn (\Illuminate\Database\Eloquent\Builder $query) => $query->with('artists'));
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            TracksRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

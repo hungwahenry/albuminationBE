@@ -3,6 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RotationResource\Pages;
+use App\Filament\Resources\RotationResource\RelationManagers\CommentsRelationManager;
+use App\Filament\Resources\RotationResource\RelationManagers\ItemsRelationManager;
 use App\Models\Rotation;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
@@ -156,6 +158,14 @@ class RotationResource extends Resource
                 ]),
             ])
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['user.profile', 'vibetags']));
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ItemsRelationManager::class,
+            CommentsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
