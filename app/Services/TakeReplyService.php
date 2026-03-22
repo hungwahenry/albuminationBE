@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\TakeReplyCreated;
 use App\Models\Take;
 use App\Models\TakeReply;
 use App\Models\User;
@@ -22,7 +23,13 @@ class TakeReplyService
 
             $take->increment('replies_count');
 
-            return $reply->load(['user.profile', 'replyToUser.profile']);
+            $reply->load(['user.profile', 'replyToUser.profile', 'take.user']);
+
+            $replyToUser = $reply->replyToUser;
+
+            TakeReplyCreated::dispatch($user, $take, $replyToUser, $reply);
+
+            return $reply;
         });
     }
 

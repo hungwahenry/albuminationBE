@@ -16,6 +16,9 @@ use App\Http\Controllers\TakeReplyController;
 use App\Http\Controllers\TrackFavouriteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileCustomizationController;
+use App\Http\Controllers\NotificationPreferenceController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UsernameController;
@@ -101,6 +104,19 @@ Route::middleware('auth:sanctum')->group(function () {
         // Profile
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::delete('/profile/followers/{username}', [FollowController::class, 'removeFollower']);
+
+        // Notification preferences
+        Route::get('/notifications/preferences', [NotificationPreferenceController::class, 'show']);
+        Route::put('/notifications/preferences', [NotificationPreferenceController::class, 'update']);
+
+        // Device tokens for push notifications
+        Route::post('/notifications/devices', [DeviceTokenController::class, 'store']);
+        Route::delete('/notifications/devices', [DeviceTokenController::class, 'destroy']);
+
+        // Notifications
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 
         // Profile Customization
         Route::prefix('profile/customization')->group(function () {

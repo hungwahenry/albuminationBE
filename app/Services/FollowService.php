@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Follow;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\Events\FollowCreated;
 
 class FollowService
 {
@@ -30,6 +31,8 @@ class FollowService
 
             $target->profile->increment('followers_count');
             $follower->profile->increment('following_count');
+
+            FollowCreated::dispatch($follower, $target);
 
             return true;
         });

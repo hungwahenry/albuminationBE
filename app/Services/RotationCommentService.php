@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\RotationCommentCreated;
 use App\Models\Rotation;
 use App\Models\RotationComment;
 use App\Models\User;
@@ -27,7 +28,13 @@ class RotationCommentService
                 RotationComment::where('id', $parentId)->increment('replies_count');
             }
 
-            return $comment->load(['user.profile', 'replyToUser.profile']);
+            $comment->load(['user.profile', 'replyToUser.profile', 'rotation.user']);
+
+            $replyToUser = $comment->replyToUser;
+
+            RotationCommentCreated::dispatch($user, $rotation, $replyToUser, $comment);
+
+            return $comment;
         });
     }
 

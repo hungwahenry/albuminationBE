@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\RotationPublished;
 use App\Models\Profile;
 use App\Models\Rotation;
 use App\Models\User;
@@ -72,6 +73,10 @@ class RotationService
             ]);
 
             $rotation->user->profile->increment('rotations_count');
+
+            $rotation->load('user.profile');
+
+            RotationPublished::dispatch($rotation->user, $rotation);
 
             return $rotation;
         });

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\ContentLoved;
 use App\Models\Love;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +41,8 @@ class LoveService
             ]);
 
             $loveable->increment('loves_count');
+
+            ContentLoved::dispatch($user, $loveable);
 
             return [
                 'loved'       => true,

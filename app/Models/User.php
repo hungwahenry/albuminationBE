@@ -38,6 +38,16 @@ class User extends Authenticatable
         return $this->hasOne(Profile::class);
     }
 
+    public function notificationPreferences(): HasOne
+    {
+        return $this->hasOne(UserNotificationPreference::class);
+    }
+
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+
     public function favouriteTracks(): BelongsToMany
     {
         return $this->belongsToMany(Track::class, 'track_favourites');

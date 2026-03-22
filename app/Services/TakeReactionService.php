@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\TakeReactionChanged;
 use App\Models\Take;
 use App\Models\TakeReaction;
 use App\Models\User;
@@ -43,6 +44,8 @@ class TakeReactionService
                 $take->decrement("{$oldType}s_count");
                 $take->increment("{$type}s_count");
 
+                TakeReactionChanged::dispatch($user, $take, $type);
+
                 return [
                     'type'            => $type,
                     'agrees_count'    => max(0, $take->agrees_count),
@@ -57,6 +60,8 @@ class TakeReactionService
             ]);
 
             $take->increment("{$type}s_count");
+
+            TakeReactionChanged::dispatch($user, $take, $type);
 
             return [
                 'type'            => $type,
