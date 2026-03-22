@@ -20,6 +20,8 @@ class UpdateProfileRequest extends FormRequest
             'display_name'      => ['sometimes', 'string', 'max:255'],
             'username'          => ['sometimes', 'string', 'min:4', 'max:32', 'regex:/^[a-zA-Z0-9_]+$/', Rule::unique('profiles')->ignore($profileId)],
             'bio'               => ['nullable', 'string', 'max:500'],
+            'gender'            => ['nullable', 'string', 'in:male,female,non_binary,prefer_not_to_say'],
+            'place_name'        => ['nullable', 'string', 'max:255'],
             'avatar'            => ['nullable', 'image', 'max:2048'],
         ];
     }

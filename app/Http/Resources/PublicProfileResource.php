@@ -36,6 +36,7 @@ class PublicProfileResource extends JsonResource
             'display_name'    => $profile->display_name,
             'avatar'          => $profile->avatar,
             'bio'             => $profile->bio,
+            'gender'          => $profile->gender,
             'location'        => $profile->place_name,
             'followers_count' => $profile->followers_count,
             'following_count' => $profile->following_count,
