@@ -8,9 +8,6 @@ class AppConfig extends Model
 {
     protected $fillable = ['key', 'value', 'type', 'group', 'description'];
 
-    /**
-     * Return the value cast to its declared type.
-     */
     public function getCastValueAttribute(): mixed
     {
         return match ($this->type) {
@@ -20,9 +17,6 @@ class AppConfig extends Model
         };
     }
 
-    /**
-     * Convenience: get a config value by key.
-     */
     public static function get(string $key, mixed $default = null): mixed
     {
         $record = static::where('key', $key)->first();

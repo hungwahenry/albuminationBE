@@ -80,8 +80,6 @@ class FeedController extends Controller
             return $this->error('Unknown feed section type', 422);
         }
 
-        // For featured_albums the paginator contains FeaturedAlbum models;
-        // we need to map through to the nested album before passing to the resource.
         if ($type === 'featured_albums') {
             $items = $paginated->getCollection()->map->album;
             $paginated->setCollection($items);

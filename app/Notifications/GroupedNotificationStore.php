@@ -8,11 +8,6 @@ use Illuminate\Support\Str;
 
 class GroupedNotificationStore
 {
-    /**
-     * Store or update a grouped database notification.
-     *
-     * Returns true if a new notification row was created, false if an existing one was updated.
-     */
     public function store(User $recipient, object $notification, string $groupKey): bool
     {
         if (!method_exists($notification, 'toDatabase')) {
@@ -21,7 +16,6 @@ class GroupedNotificationStore
 
         $baseData = $notification->toDatabase($recipient);
 
-        /** @var DatabaseNotification|null $existing */
         $existing = DatabaseNotification::query()
             ->where('notifiable_type', $recipient->getMorphClass())
             ->where('notifiable_id', $recipient->getKey())

@@ -11,10 +11,7 @@ class StanService
 {
     /**
      * Toggle a stan for an artist.
-     * Increments/decrements the stans_count counter cache on the artist.
-     *
-     * @return array{ is_stanned: bool, stans_count: int }
-     */
+    */
     public function toggle(User $user, Artist $artist): array
     {
         return DB::transaction(function () use ($user, $artist) {

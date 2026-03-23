@@ -12,10 +12,7 @@ class LoveService
 {
     /**
      * Toggle a love for any loveable model.
-     * Increments/decrements the loves_count counter cache on the model.
-     *
-     * @return array{ loved: bool, loves_count: int }
-     */
+    */
     public function toggle(User $user, Model $loveable): array
     {
         return DB::transaction(function () use ($user, $loveable) {

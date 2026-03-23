@@ -12,12 +12,7 @@ class TakeReactionService
 {
     /**
      * React to a take with agree or disagree.
-     * - Same type as existing → remove reaction
-     * - Different type → switch reaction
-     * - No existing → create
-     *
-     * @return array{ type: string|null, agrees_count: int, disagrees_count: int }
-     */
+    */
     public function react(User $user, Take $take, string $type): array
     {
         return DB::transaction(function () use ($user, $take, $type) {

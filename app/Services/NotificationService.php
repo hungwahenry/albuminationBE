@@ -27,6 +27,9 @@ class NotificationService
 {
     public function __construct(private readonly GroupedNotificationStore $store) {}
 
+    /**
+     * Notify a user when someone follows them.
+     */
     public function onFollowCreated(User $follower, User $target): void
     {
         if ($follower->id === $target->id) {
@@ -41,6 +44,9 @@ class NotificationService
         );
     }
 
+    /**
+     * Notify the take author and the replied-to user when a reply is posted.
+     */
     public function onTakeReplyCreated(User $replier, Take $take, ?User $replyToUser, TakeReply $reply): void
     {
         $excerpt = Str::limit(trim((string) $reply->body), 140);
@@ -80,6 +86,9 @@ class NotificationService
         }
     }
 
+    /**
+     * Notify the rotation author and the replied-to user when a comment is posted.
+     */
     public function onRotationCommentCreated(User $commenter, Rotation $rotation, ?User $replyToUser, RotationComment $comment): void
     {
         $excerpt = Str::limit(trim((string) $comment->body), 140);
@@ -115,6 +124,9 @@ class NotificationService
         }
     }
 
+    /**
+     * Notify all followers when a rotation is published.
+     */
     public function onRotationPublished(User $author, Rotation $rotation): void
     {
         if (!$rotation->isPublished()) {
@@ -142,6 +154,9 @@ class NotificationService
             });
     }
 
+    /**
+     * Notify the content owner when their take, rotation, or album is loved.
+     */
     public function onContentLoved(User $actor, Model $loveable): void
     {
         $owner = ContentLovedNotification::resolveOwner($loveable);
@@ -166,6 +181,9 @@ class NotificationService
         );
     }
 
+    /**
+     * Notify the reporter when their report is reviewed or dismissed.
+     */
     public function onReportResolved(Report $report, string $resolution): void
     {
         $reporter = $report->user;
@@ -182,6 +200,9 @@ class NotificationService
         );
     }
 
+    /**
+     * Notify the take author when someone reacts to their take.
+     */
     public function onTakeReacted(User $actor, Take $take, string $type): void
     {
         if ($take->user_id === $actor->id) {
@@ -198,6 +219,9 @@ class NotificationService
         );
     }
 
+    /**
+     * Dispatch a notification respecting user preferences and in-app grouping.
+     */
     private function notifyWithGrouping(
         User $recipient,
         object $notification,

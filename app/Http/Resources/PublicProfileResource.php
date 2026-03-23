@@ -17,7 +17,6 @@ class PublicProfileResource extends JsonResource
         $isBlocked = $isOther ? $request->user()->hasBlocked($user->id) : false;
         $isBlockedBy = $isOther ? $user->hasBlocked(Auth::id()) : false;
 
-        // If the viewer is blocked by this user, return minimal data
         if ($isBlockedBy) {
             return [
                 'id'             => $user->id,

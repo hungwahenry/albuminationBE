@@ -29,7 +29,6 @@ class ContentLovedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        // Channels are selected centrally in NotificationService based on user preferences.
         return [];
     }
 
@@ -61,9 +60,7 @@ class ContentLovedNotification extends Notification implements ShouldQueue
         ], $this->navData);
     }
 
-    /**
-     * Resolve the owning user of a loveable model, or null if notifications are not applicable.
-     */
+
     public static function resolveOwner(Model $loveable): ?User
     {
         return match (true) {
@@ -75,11 +72,6 @@ class ContentLovedNotification extends Notification implements ShouldQueue
         };
     }
 
-    /**
-     * Resolve the notification context (type, id, title, group key, nav data) for a loveable model.
-     *
-     * @return array{0: string, 1: int, 2: ?string, 3: string, 4: array}
-     */
     public static function resolveContext(Model $loveable): array
     {
         if ($loveable instanceof Rotation) {

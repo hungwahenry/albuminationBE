@@ -12,7 +12,6 @@ class ExportService
 {
     /**
      * Builds a complete, clean export payload for the given user.
-     * Eager-loads all required relations in a single pass to avoid N+1.
      */
     public function build(User $user, Request $request): array
     {

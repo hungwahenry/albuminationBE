@@ -9,10 +9,7 @@ class VibetagService
 {
     /**
      * Sync vibetags for a rotation. Handles creation, linking, and usage counts.
-     *
-     * @param  \App\Models\Rotation  $rotation
-     * @param  string[]              $tagNames  Raw tag names (with or without ~ prefix)
-     */
+    */
     public function sync($rotation, array $tagNames): void
     {
         DB::transaction(function () use ($rotation, $tagNames) {

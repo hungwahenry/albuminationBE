@@ -15,9 +15,6 @@ class FollowController extends Controller
 
     public function __construct(private FollowService $followService) {}
 
-    /**
-     * Toggle follow on a user.
-     */
     public function toggle(Request $request, string $username): JsonResponse
     {
         $profile = Profile::where('username', $username)->first();
@@ -44,9 +41,6 @@ class FollowController extends Controller
         ]);
     }
 
-    /**
-     * List followers of a user.
-     */
     public function followers(Request $request, string $username): JsonResponse
     {
         $profile = Profile::where('username', $username)->first();
@@ -67,9 +61,6 @@ class FollowController extends Controller
         );
     }
 
-    /**
-     * List users that a user is following.
-     */
     public function following(Request $request, string $username): JsonResponse
     {
         $profile = Profile::where('username', $username)->first();
@@ -90,9 +81,6 @@ class FollowController extends Controller
         );
     }
 
-    /**
-     * Remove a follower from your own followers list.
-     */
     public function removeFollower(Request $request, string $username): JsonResponse
     {
         $profile = Profile::where('username', $username)->first();

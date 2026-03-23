@@ -51,7 +51,7 @@ class ExpoPushChannel
                 ];
             }
 
-            $response = Http::post('https://exp.host/--/api/v2/push/send', $messages);
+            $response = Http::post(config('services.expo.push_url'), $messages);
 
             Log::channel('stack')->info('ExpoPush sent', [
                 'tokens' => $chunk,

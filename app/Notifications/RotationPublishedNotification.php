@@ -21,7 +21,6 @@ class RotationPublishedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        // Channels are selected centrally in NotificationService based on user preferences.
         return [];
     }
 

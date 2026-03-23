@@ -14,9 +14,9 @@ class CommentOrReplyNotification extends Notification implements ShouldQueue
 
     public function __construct(
         private readonly User $actor,
-        private readonly string $contextType, // e.g. take, rotation
+        private readonly string $contextType,
         private readonly int $contextId,
-        private readonly string $kind, // 'comment' or 'reply'
+        private readonly string $kind,
         private readonly ?string $excerpt = null,
         private readonly ?string $albumMbid = null,
     ) {
@@ -24,7 +24,6 @@ class CommentOrReplyNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        // Channels are selected centrally in NotificationService based on user preferences.
         return [];
     }
 

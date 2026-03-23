@@ -9,13 +9,6 @@ class AdminBroadcastNotification extends Notification
 {
     use Queueable;
 
-    /**
-     * @param  string       $title
-     * @param  string       $body
-     * @param  string       $sentBy
-     * @param  string|null  $intentType    'screen' | 'url' | null
-     * @param  string|null  $intentTarget  Screen key (e.g. 'home') or full URL
-     */
     public function __construct(
         private readonly string  $title,
         private readonly string  $body,

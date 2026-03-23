@@ -16,8 +16,6 @@ class NotificationResource extends JsonResource
 
         $actors = $raw['actors'] ?? array_filter([($raw['actor'] ?? null)]);
 
-        // System notifications (broadcast, report_updated) have no real actor.
-        // Inject a synthetic System actor so the frontend avatar logic is uniform.
         if (empty($actors)) {
             $actors = [[
                 'id'           => 0,

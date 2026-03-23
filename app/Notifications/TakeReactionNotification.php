@@ -16,13 +16,12 @@ class TakeReactionNotification extends Notification implements ShouldQueue
     public function __construct(
         private readonly User $actor,
         private readonly Take $take,
-        private readonly string $type, // 'agree' or 'disagree'
+        private readonly string $type,
     ) {
     }
 
     public function via(object $notifiable): array
     {
-        // Channels are selected centrally in NotificationService based on user preferences.
         return [];
     }
 
