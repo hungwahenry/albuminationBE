@@ -110,7 +110,7 @@ class FailedJobResource extends Resource
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->visible(fn () => auth()->user()->can('system.queue'))
+                    ->visible(fn () => auth('admin')->user()?->can('system.queue'))
                     ->action(function (FailedJob $record) {
                         Artisan::call('queue:retry', ['id' => [$record->uuid]]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -118,7 +118,7 @@ class FailedJobResource extends Resource
                         Notification::make()->title('Job queued for retry')->success()->send();
                     }),
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->can('system.queue'))
+                    ->visible(fn () => auth('admin')->user()?->can('system.queue'))
                     ->before(fn (FailedJob $record) => activity()->causedBy(auth()->user())
                         ->log("Deleted failed job: {$record->uuid}")),
             ])
@@ -129,7 +129,7 @@ class FailedJobResource extends Resource
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('system.queue'))
+                        ->visible(fn () => auth('admin')->user()?->can('system.queue'))
                         ->action(function (Collection $records) {
                             $uuids = $records->pluck('uuid')->toArray();
                             Artisan::call('queue:retry', ['id' => $uuids]);
@@ -138,7 +138,7 @@ class FailedJobResource extends Resource
                             Notification::make()->title(count($uuids) . ' jobs queued for retry')->success()->send();
                         }),
                     DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->can('system.queue')),
+                        ->visible(fn () => auth('admin')->user()?->can('system.queue')),
                 ]),
             ]);
     }

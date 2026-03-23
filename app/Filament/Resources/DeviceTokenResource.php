@@ -77,7 +77,7 @@ class DeviceTokenResource extends Resource
             ])
             ->actions([
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->can('device_tokens.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('device_tokens.manage'))
                     ->before(fn (DeviceToken $r) => activity()->causedBy(auth()->user())
                         ->performedOn($r)->log("Deleted device token for user ID {$r->user_id}")),
             ])
@@ -88,7 +88,7 @@ class DeviceTokenResource extends Resource
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('device_tokens.manage'))
+                        ->visible(fn () => auth('admin')->user()?->can('device_tokens.manage'))
                         ->action(function (Collection $records) {
                             $count = $records->count();
                             $records->each->delete();
@@ -97,7 +97,7 @@ class DeviceTokenResource extends Resource
                             Notification::make()->title("{$count} device tokens removed")->success()->send();
                         }),
                     DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->can('device_tokens.manage')),
+                        ->visible(fn () => auth('admin')->user()?->can('device_tokens.manage')),
                 ]),
             ])
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['user.profile']));

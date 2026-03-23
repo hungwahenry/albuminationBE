@@ -22,7 +22,7 @@ class CacheManagement extends Page
     public function mount(): void
     {
         abort_unless(
-            auth()->user()->can('search_index.manage') || auth()->user()->can('media.manage'),
+            auth('admin')->user()?->can('search_index.manage') || auth('admin')->user()?->can('media.manage'),
             403
         );
 
@@ -50,7 +50,7 @@ class CacheManagement extends Page
                 ->color('warning')
                 ->requiresConfirmation()
                 ->modalDescription('This will clear all cached MusicBrainz search results. Next searches will re-fetch from MusicBrainz (may be slow).')
-                ->visible(fn () => auth()->user()->can('search_index.manage'))
+                ->visible(fn () => auth('admin')->user()?->can('search_index.manage'))
                 ->action(function () {
                     $flushed = 0;
                     foreach (Cache::getStore()->getPrefix() ? [] : [] as $_) {}
@@ -79,7 +79,7 @@ class CacheManagement extends Page
                 ->color('gray')
                 ->requiresConfirmation()
                 ->modalDescription('This clears the welcome screen cover art cache. New covers will be randomly selected on next load.')
-                ->visible(fn () => auth()->user()->can('media.manage'))
+                ->visible(fn () => auth('admin')->user()?->can('media.manage'))
                 ->action(function () {
                     Cache::forget('welcome:covers');
                     activity()->causedBy(auth()->user())->log('Flushed welcome covers cache');

@@ -49,7 +49,7 @@ class TokensRelationManager extends RelationManager
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->visible(fn () => auth()->user()->can('users.edit'))
+                    ->visible(fn () => auth('admin')->user()?->can('users.edit'))
                     ->action(function (PersonalAccessToken $record) {
                         activity()
                             ->causedBy(auth()->user())

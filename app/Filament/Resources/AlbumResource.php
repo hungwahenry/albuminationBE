@@ -109,7 +109,7 @@ class AlbumResource extends Resource
                     ->label('Seed Tracks')
                     ->icon('heroicon-o-musical-note')
                     ->color('info')
-                    ->visible(fn (Album $record) => $record->mbid && auth()->user()->can('catalog.sync'))
+                    ->visible(fn (Album $record) => $record->mbid && auth('admin')->user()?->can('catalog.sync'))
                     ->action(function (Album $album) {
                         SeedAlbumTracksJob::dispatch($album->id);
                         activity()->causedBy(auth()->user())->performedOn($album)
@@ -122,7 +122,7 @@ class AlbumResource extends Resource
                     ->color('warning')
                     ->requiresConfirmation()
                     ->modalDescription('This will clear the MusicBrainz cache for this album\'s MBID. The next search will re-fetch from MusicBrainz.')
-                    ->visible(fn () => auth()->user()->can('catalog.cache.flush'))
+                    ->visible(fn () => auth('admin')->user()?->can('catalog.cache.flush'))
                     ->action(function (Album $album) {
                         foreach ([5, 10, 15, 25, 50] as $limit) {
                             Cache::forget("mb_search:album:" . md5("{$album->title}:{$limit}"));
@@ -138,7 +138,7 @@ class AlbumResource extends Resource
                     ->label('Seed Tracks')
                     ->icon('heroicon-o-musical-note')
                     ->color('info')
-                    ->visible(fn () => auth()->user()->can('catalog.sync'))
+                    ->visible(fn () => auth('admin')->user()?->can('catalog.sync'))
                     ->requiresConfirmation()
                     ->modalDescription('This will queue a track-seeding job for each selected album that is missing tracks.')
                     ->action(function (Collection $records) {

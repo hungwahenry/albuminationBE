@@ -20,7 +20,7 @@ class ScheduledTasks extends Page
 
     public function mount(): void
     {
-        abort_unless(auth()->user()->can('system.schedule'), 403);
+        abort_unless(auth('admin')->user()?->can('system.schedule'), 403);
         $this->loadTasks();
     }
 
@@ -50,7 +50,7 @@ class ScheduledTasks extends Page
                 ->color('warning')
                 ->requiresConfirmation()
                 ->modalDescription('This runs php artisan schedule:run immediately. Only due tasks will execute.')
-                ->visible(fn () => auth()->user()->can('system.schedule'))
+                ->visible(fn () => auth('admin')->user()?->can('system.schedule'))
                 ->action(function () {
                     Artisan::call('schedule:run');
                     $output = trim(Artisan::output());

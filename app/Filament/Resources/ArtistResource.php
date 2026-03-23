@@ -122,12 +122,12 @@ class ArtistResource extends Resource
                 ViewAction::make(),
                 EditAction::make()
                     ->label('Edit Image')
-                    ->visible(fn () => auth()->user()->can('catalog.edit')),
+                    ->visible(fn () => auth('admin')->user()?->can('catalog.edit')),
                 Action::make('enrich')
                     ->label('Enrich from MB')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('info')
-                    ->visible(fn (Artist $record) => $record->mbid && auth()->user()->can('catalog.sync'))
+                    ->visible(fn (Artist $record) => $record->mbid && auth('admin')->user()?->can('catalog.sync'))
                     ->action(function (Artist $artist) {
                         EnrichArtistJob::dispatch($artist->id);
                         activity()->causedBy(auth()->user())->performedOn($artist)
@@ -140,7 +140,7 @@ class ArtistResource extends Resource
                     ->label('Enrich from MusicBrainz')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('info')
-                    ->visible(fn () => auth()->user()->can('catalog.sync'))
+                    ->visible(fn () => auth('admin')->user()?->can('catalog.sync'))
                     ->requiresConfirmation()
                     ->modalDescription('This will queue a MusicBrainz enrichment job for each selected artist to fill missing metadata.')
                     ->action(function (Collection $records) {

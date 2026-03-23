@@ -51,7 +51,7 @@ class CommentsRelationManager extends RelationManager
                     ->icon('heroicon-o-eye-slash')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->visible(fn (RotationComment $r) => !$r->is_deleted && auth()->user()->can('content.delete'))
+                    ->visible(fn (RotationComment $r) => !$r->is_deleted && auth('admin')->user()?->can('content.delete'))
                     ->action(function (RotationComment $record) {
                         $record->update(['is_deleted' => true]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -63,7 +63,7 @@ class CommentsRelationManager extends RelationManager
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->visible(fn () => auth()->user()->can('content.delete'))
+                    ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                     ->action(function (RotationComment $record) {
                         activity()->causedBy(auth()->user())->performedOn($record)
                             ->log("Hard-deleted rotation comment ID {$record->id}");

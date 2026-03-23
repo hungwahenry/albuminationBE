@@ -91,7 +91,7 @@ class ReportReasonResource extends Resource
                     ->label(fn (ReportReason $r) => $r->is_active ? 'Deactivate' : 'Activate')
                     ->icon(fn (ReportReason $r) => $r->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (ReportReason $r) => $r->is_active ? 'warning' : 'success')
-                    ->visible(fn () => auth()->user()->can('report_reasons.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('report_reasons.manage'))
                     ->action(function (ReportReason $record) {
                         $record->update(['is_active' => !$record->is_active]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -101,9 +101,9 @@ class ReportReasonResource extends Resource
                             ->success()->send();
                     }),
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->can('report_reasons.manage')),
+                    ->visible(fn () => auth('admin')->user()?->can('report_reasons.manage')),
                 DeleteAction::make()
-                    ->visible(fn (ReportReason $r) => auth()->user()->can('report_reasons.manage') && $r->reports()->count() === 0)
+                    ->visible(fn (ReportReason $r) => auth('admin')->user()?->can('report_reasons.manage') && $r->reports()->count() === 0)
                     ->before(function (ReportReason $record) {
                         activity()->causedBy(auth()->user())->performedOn($record)
                             ->log("Deleted report reason: {$record->label}");
@@ -123,6 +123,6 @@ class ReportReasonResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()->can('report_reasons.manage');
+        return auth('admin')->user()?->can('report_reasons.manage');
     }
 }

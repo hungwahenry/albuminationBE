@@ -169,7 +169,7 @@ class ReportResource extends Resource
                     ->label('Mark Reviewed')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->visible(fn (Report $r) => $r->status === 'pending' && auth()->user()->can('reports.action'))
+                    ->visible(fn (Report $r) => $r->status === 'pending' && auth('admin')->user()?->can('reports.action'))
                     ->action(function (Report $report) {
                         $report->update(['status' => 'reviewed']);
                         activity()->causedBy(auth()->user())->performedOn($report)->log('Marked report as reviewed');
@@ -181,7 +181,7 @@ class ReportResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalDescription('This will notify the reporter that their report has been actioned.')
-                    ->visible(fn (Report $r) => in_array($r->status, ['pending', 'reviewed']) && auth()->user()->can('reports.action'))
+                    ->visible(fn (Report $r) => in_array($r->status, ['pending', 'reviewed']) && auth('admin')->user()?->can('reports.action'))
                     ->action(function (Report $report) {
                         $report->update(['status' => 'actioned']);
                         ReportResolved::dispatch($report, 'resolved');
@@ -193,7 +193,7 @@ class ReportResource extends Resource
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
                     ->requiresConfirmation()
-                    ->visible(fn (Report $r) => in_array($r->status, ['pending', 'reviewed']) && auth()->user()->can('reports.action'))
+                    ->visible(fn (Report $r) => in_array($r->status, ['pending', 'reviewed']) && auth('admin')->user()?->can('reports.action'))
                     ->action(function (Report $report) {
                         $report->update(['status' => 'dismissed']);
                         ReportResolved::dispatch($report, 'dismissed');
@@ -207,7 +207,7 @@ class ReportResource extends Resource
                         ->label('Mark Reviewed')
                         ->icon('heroicon-o-eye')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('reports.action'))
+                        ->visible(fn () => auth('admin')->user()?->can('reports.action'))
                         ->action(function (Collection $records) {
                             $count = $records->count();
                             $records->each->update(['status' => 'reviewed']);
@@ -218,7 +218,7 @@ class ReportResource extends Resource
                         ->icon('heroicon-o-x-circle')
                         ->color('gray')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('reports.action'))
+                        ->visible(fn () => auth('admin')->user()?->can('reports.action'))
                         ->action(function (Collection $records) {
                             $count = $records->count();
                             $records->each->update(['status' => 'dismissed']);

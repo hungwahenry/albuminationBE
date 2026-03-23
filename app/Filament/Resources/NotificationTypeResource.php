@@ -63,7 +63,7 @@ class NotificationTypeResource extends Resource
                     ->label(fn (NotificationType $r) => $r->is_active ? 'Deactivate' : 'Activate')
                     ->icon(fn (NotificationType $r) => $r->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (NotificationType $r) => $r->is_active ? 'warning' : 'success')
-                    ->visible(fn () => auth()->user()->can('notifications.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('notifications.manage'))
                     ->action(function (NotificationType $record) {
                         $record->update(['is_active' => !$record->is_active]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -73,7 +73,7 @@ class NotificationTypeResource extends Resource
                             ->success()->send();
                     }),
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->can('notifications.manage')),
+                    ->visible(fn () => auth('admin')->user()?->can('notifications.manage')),
             ])
             ->bulkActions([]);
     }
@@ -89,6 +89,6 @@ class NotificationTypeResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()->can('notifications.manage');
+        return auth('admin')->user()?->can('notifications.manage');
     }
 }

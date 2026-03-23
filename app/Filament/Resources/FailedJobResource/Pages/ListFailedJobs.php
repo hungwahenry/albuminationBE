@@ -19,7 +19,7 @@ class ListFailedJobs extends ListRecords
                 ->color('warning')
                 ->requiresConfirmation()
                 ->modalDescription('This will re-queue every failed job. Are you sure?')
-                ->visible(fn () => auth()->user()->can('system.queue') && \App\Models\FailedJob::count() > 0)
+                ->visible(fn () => auth('admin')->user()?->can('system.queue') && \App\Models\FailedJob::count() > 0)
                 ->action(function () {
                     \Illuminate\Support\Facades\Artisan::call('queue:retry', ['id' => ['all']]);
                     activity()->causedBy(auth()->user())->log('Retried all failed jobs');

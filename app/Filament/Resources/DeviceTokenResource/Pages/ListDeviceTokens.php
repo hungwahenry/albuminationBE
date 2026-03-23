@@ -19,7 +19,7 @@ class ListDeviceTokens extends ListRecords
                 ->color('danger')
                 ->requiresConfirmation()
                 ->modalDescription('Delete all device tokens not used in 90+ days (and registered 90+ days ago).')
-                ->visible(fn () => auth()->user()->can('device_tokens.manage'))
+                ->visible(fn () => auth('admin')->user()?->can('device_tokens.manage'))
                 ->action(function () {
                     $count = \App\Models\DeviceToken::where(function ($q) {
                         $q->whereNull('last_used_at')

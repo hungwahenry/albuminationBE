@@ -54,9 +54,9 @@ class FeaturedAlbumResource extends Resource
             ->defaultSort('sort_order')
             ->actions([
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->can('catalog.featured.manage')),
+                    ->visible(fn () => auth('admin')->user()?->can('catalog.featured.manage')),
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->can('catalog.featured.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('catalog.featured.manage'))
                     ->before(function (FeaturedAlbum $record) {
                         activity()->causedBy(auth()->user())->performedOn($record)
                             ->log("Removed featured album: {$record->album->title} (position {$record->sort_order})");

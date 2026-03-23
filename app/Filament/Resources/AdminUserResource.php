@@ -93,7 +93,7 @@ class AdminUserResource extends Resource
                     ->icon(fn (AdminUser $r) => $r->is_active ? 'heroicon-o-lock-closed' : 'heroicon-o-lock-open')
                     ->color(fn (AdminUser $r) => $r->is_active ? 'danger' : 'success')
                     ->requiresConfirmation()
-                    ->visible(fn (AdminUser $r) => auth()->user()->can('admin_users.manage') && $r->id !== auth()->id())
+                    ->visible(fn (AdminUser $r) => auth('admin')->user()?->can('admin_users.manage') && $r->id !== auth()->id())
                     ->action(function (AdminUser $record) {
                         $record->update(['is_active' => !$record->is_active]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -113,7 +113,7 @@ class AdminUserResource extends Resource
                             ->required()
                             ->minLength(8),
                     ])
-                    ->visible(fn () => auth()->user()->can('admin_users.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('admin_users.manage'))
                     ->action(function (AdminUser $record, array $data) {
                         $record->update(['password' => Hash::make($data['new_password'])]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -121,7 +121,7 @@ class AdminUserResource extends Resource
                         Notification::make()->title('Password reset successfully')->success()->send();
                     }),
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->can('admin_users.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('admin_users.manage'))
                     ->using(function (AdminUser $record, array $data) {
                         $record->update(collect($data)->except('roles')->toArray());
                         if (isset($data['roles'])) {
@@ -146,11 +146,11 @@ class AdminUserResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()->can('admin_users.manage');
+        return auth('admin')->user()?->can('admin_users.manage') ?? false;
     }
 
     public static function canViewAny(): bool
     {
-        return auth()->user()->can('admin_users.manage');
+        return auth('admin')->user()?->can('admin_users.manage') ?? false;
     }
 }

@@ -123,7 +123,7 @@ class RotationResource extends Resource
                     ->icon('heroicon-o-eye-slash')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->visible(fn (Rotation $r) => $r->status === 'published' && auth()->user()->can('content.delete'))
+                    ->visible(fn (Rotation $r) => $r->status === 'published' && auth('admin')->user()?->can('content.delete'))
                     ->action(function (Rotation $record) {
                         $record->update(['status' => 'draft', 'published_at' => null]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -136,7 +136,7 @@ class RotationResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalDescription('This permanently removes the rotation, all its items, comments, and loves.')
-                    ->visible(fn () => auth()->user()->can('content.delete'))
+                    ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                     ->action(function (Rotation $record) {
                         activity()->causedBy(auth()->user())->performedOn($record)
                             ->log("Hard-deleted rotation ID {$record->id}: {$record->title}");
@@ -153,7 +153,7 @@ class RotationResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('content.delete'))
+                        ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                         ->action(function (Collection $records) {
                             $records->each->update(['status' => 'draft', 'published_at' => null]);
                             activity()->causedBy(auth()->user())
@@ -181,9 +181,9 @@ class RotationResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool { return auth()->user()->can('rotations.view'); }
-    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool { return auth()->user()->can('rotations.view'); }
+    public static function canViewAny(): bool { return auth('admin')->user()?->can('rotations.view'); }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool { return auth('admin')->user()?->can('rotations.view'); }
     public static function canCreate(): bool { return false; }
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool { return false; }
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool { return auth()->user()->can('content.delete'); }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool { return auth('admin')->user()?->can('content.delete'); }
 }

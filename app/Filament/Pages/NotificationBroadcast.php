@@ -30,7 +30,7 @@ class NotificationBroadcast extends Page implements HasForms
 
     public function mount(): void
     {
-        abort_unless(auth()->user()->can('notifications.manage'), 403);
+        abort_unless(auth('admin')->user()?->can('notifications.manage'), 403);
         $this->form->fill();
     }
 

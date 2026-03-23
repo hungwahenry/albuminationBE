@@ -108,7 +108,7 @@ class TakeResource extends Resource
                     ->icon('heroicon-o-eye-slash')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->visible(fn (Take $r) => !$r->is_deleted && auth()->user()->can('content.delete'))
+                    ->visible(fn (Take $r) => !$r->is_deleted && auth('admin')->user()?->can('content.delete'))
                     ->action(function (Take $record) {
                         $record->update(['is_deleted' => true]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -121,7 +121,7 @@ class TakeResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalDescription('This permanently removes the take and all its replies and reactions. This cannot be undone.')
-                    ->visible(fn () => auth()->user()->can('content.delete'))
+                    ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                     ->action(function (Take $record) {
                         activity()->causedBy(auth()->user())->performedOn($record)
                             ->log("Hard-deleted take ID {$record->id} by {$record->user?->email}");
@@ -138,7 +138,7 @@ class TakeResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('content.delete'))
+                        ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                         ->action(function (Collection $records) {
                             $records->each->update(['is_deleted' => true]);
                             activity()->causedBy(auth()->user())
@@ -150,7 +150,7 @@ class TakeResource extends Resource
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('content.delete'))
+                        ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                         ->action(function (Collection $records) {
                             $count = $records->count();
                             $records->each(function (Take $r) {
@@ -175,9 +175,9 @@ class TakeResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool { return auth()->user()->can('takes.view'); }
-    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool { return auth()->user()->can('takes.view'); }
+    public static function canViewAny(): bool { return auth('admin')->user()?->can('takes.view'); }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool { return auth('admin')->user()?->can('takes.view'); }
     public static function canCreate(): bool { return false; }
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool { return false; }
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool { return auth()->user()->can('content.delete'); }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool { return auth('admin')->user()?->can('content.delete'); }
 }

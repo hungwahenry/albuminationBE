@@ -65,7 +65,7 @@ class RotationCommentResource extends Resource
                     ->icon('heroicon-o-eye-slash')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->visible(fn (RotationComment $r) => !$r->is_deleted && auth()->user()->can('content.delete'))
+                    ->visible(fn (RotationComment $r) => !$r->is_deleted && auth('admin')->user()?->can('content.delete'))
                     ->action(function (RotationComment $record) {
                         $record->update(['is_deleted' => true]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -78,7 +78,7 @@ class RotationCommentResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalDescription('This permanently removes the comment and any replies to it.')
-                    ->visible(fn () => auth()->user()->can('content.delete'))
+                    ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                     ->action(function (RotationComment $record) {
                         activity()->causedBy(auth()->user())->performedOn($record)
                             ->log("Hard-deleted rotation comment ID {$record->id}");
@@ -94,7 +94,7 @@ class RotationCommentResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('content.delete'))
+                        ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                         ->action(function (Collection $records) {
                             $count = $records->count();
                             $records->each->update(['is_deleted' => true]);
@@ -106,7 +106,7 @@ class RotationCommentResource extends Resource
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->visible(fn () => auth()->user()->can('content.delete'))
+                        ->visible(fn () => auth('admin')->user()?->can('content.delete'))
                         ->action(function (Collection $records) {
                             $count = $records->count();
                             activity()->causedBy(auth()->user())->log("Bulk hard-deleted {$count} rotation comments");
@@ -125,9 +125,9 @@ class RotationCommentResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool { return auth()->user()->can('rotations.view'); }
-    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool { return auth()->user()->can('rotations.view'); }
+    public static function canViewAny(): bool { return auth('admin')->user()?->can('rotations.view'); }
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool { return auth('admin')->user()?->can('rotations.view'); }
     public static function canCreate(): bool { return false; }
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool { return false; }
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool { return auth()->user()->can('content.delete'); }
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool { return auth('admin')->user()?->can('content.delete'); }
 }

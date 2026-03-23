@@ -76,7 +76,7 @@ class AppConfigResource extends Resource
                     ->icon(fn (AppConfig $r) => $r->cast_value ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                     ->color(fn (AppConfig $r) => $r->cast_value ? 'danger' : 'success')
                     ->requiresConfirmation()
-                    ->visible(fn (AppConfig $r) => $r->type === 'boolean' && auth()->user()->can('app_config.manage'))
+                    ->visible(fn (AppConfig $r) => $r->type === 'boolean' && auth('admin')->user()?->can('app_config.manage'))
                     ->action(function (AppConfig $record) {
                         $newValue = $record->cast_value ? 'false' : 'true';
                         $record->update(['value' => $newValue]);
@@ -89,7 +89,7 @@ class AppConfigResource extends Resource
 
                 // String / integer: edit modal
                 EditAction::make()
-                    ->visible(fn (AppConfig $r) => $r->type !== 'boolean' && auth()->user()->can('app_config.manage'))
+                    ->visible(fn (AppConfig $r) => $r->type !== 'boolean' && auth('admin')->user()?->can('app_config.manage'))
                     ->form(fn (AppConfig $r) => $r->type === 'integer'
                         ? [
                             TextInput::make('value')

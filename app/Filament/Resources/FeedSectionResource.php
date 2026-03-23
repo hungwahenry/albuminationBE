@@ -68,7 +68,7 @@ class FeedSectionResource extends Resource
                     ->label(fn (FeedSection $r) => $r->is_active ? 'Deactivate' : 'Activate')
                     ->icon(fn (FeedSection $r) => $r->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (FeedSection $r) => $r->is_active ? 'warning' : 'success')
-                    ->visible(fn () => auth()->user()->can('feed.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('feed.manage'))
                     ->action(function (FeedSection $record) {
                         $record->update(['is_active' => !$record->is_active]);
                         activity()->causedBy(auth()->user())->performedOn($record)
@@ -78,7 +78,7 @@ class FeedSectionResource extends Resource
                             ->success()->send();
                     }),
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->can('feed.manage')),
+                    ->visible(fn () => auth('admin')->user()?->can('feed.manage')),
             ])
             ->bulkActions([]);
     }

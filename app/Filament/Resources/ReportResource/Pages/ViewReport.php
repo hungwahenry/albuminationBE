@@ -20,7 +20,7 @@ class ViewReport extends ViewRecord
                 ->label('Mark Reviewed')
                 ->icon('heroicon-o-eye')
                 ->color('info')
-                ->visible(fn () => $this->record->status === 'pending' && auth()->user()->can('reports.action'))
+                ->visible(fn () => $this->record->status === 'pending' && auth('admin')->user()?->can('reports.action'))
                 ->action(function () {
                     $this->record->update(['status' => 'reviewed']);
                     activity()->causedBy(auth()->user())->performedOn($this->record)->log('Marked report as reviewed');
@@ -34,7 +34,7 @@ class ViewReport extends ViewRecord
                 ->color('success')
                 ->requiresConfirmation()
                 ->modalDescription('This will notify the reporter that their report has been actioned.')
-                ->visible(fn () => in_array($this->record->status, ['pending', 'reviewed']) && auth()->user()->can('reports.action'))
+                ->visible(fn () => in_array($this->record->status, ['pending', 'reviewed']) && auth('admin')->user()?->can('reports.action'))
                 ->action(function () {
                     $this->record->update(['status' => 'actioned']);
                     ReportResolved::dispatch($this->record, 'resolved');
@@ -48,7 +48,7 @@ class ViewReport extends ViewRecord
                 ->icon('heroicon-o-x-circle')
                 ->color('gray')
                 ->requiresConfirmation()
-                ->visible(fn () => in_array($this->record->status, ['pending', 'reviewed']) && auth()->user()->can('reports.action'))
+                ->visible(fn () => in_array($this->record->status, ['pending', 'reviewed']) && auth('admin')->user()?->can('reports.action'))
                 ->action(function () {
                     $this->record->update(['status' => 'dismissed']);
                     ReportResolved::dispatch($this->record, 'dismissed');

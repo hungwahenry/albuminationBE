@@ -206,7 +206,7 @@ class UserResource extends Resource
                     ->color('info')
                     ->requiresConfirmation()
                     ->modalDescription('This generates a short-lived API token for this user. Copy and use it in your API client. It expires in 1 hour.')
-                    ->visible(fn () => auth()->user()->can('users.impersonate'))
+                    ->visible(fn () => auth('admin')->user()?->can('users.impersonate'))
                     ->action(function (User $user) {
                         $token = $user->createToken(
                             'admin-impersonation',
@@ -230,7 +230,7 @@ class UserResource extends Resource
                     ->color('gray')
                     ->requiresConfirmation()
                     ->modalDescription('Download a full JSON export of this user\'s profile, rotations, and takes.')
-                    ->visible(fn () => auth()->user()->can('compliance.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('compliance.manage'))
                     ->action(function (User $user) {
                         $data = app(ExportService::class)->build($user, request());
                         $filename = 'user-export-' . $user->id . '-' . now()->format('Y-m-d') . '.json';
@@ -249,7 +249,7 @@ class UserResource extends Resource
                     ->icon('heroicon-o-lock-closed')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->visible(fn () => auth()->user()->can('users.edit'))
+                    ->visible(fn () => auth('admin')->user()?->can('users.edit'))
                     ->action(function (User $user) {
                         $user->tokens()->delete();
                         $user->deviceTokens()->delete();
@@ -268,7 +268,7 @@ class UserResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalDescription('This will permanently delete the user account and all associated data. This cannot be undone.')
-                    ->visible(fn () => auth()->user()->can('users.delete'))
+                    ->visible(fn () => auth('admin')->user()?->can('users.delete'))
                     ->action(function (User $user) {
                         activity()
                             ->causedBy(auth()->user())

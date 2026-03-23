@@ -40,7 +40,7 @@ class VibetagResource extends Resource
             ->actions([
                 EditAction::make()
                     ->label('Rename')
-                    ->visible(fn () => auth()->user()->can('vibetags.manage')),
+                    ->visible(fn () => auth('admin')->user()?->can('vibetags.manage')),
                 Action::make('merge')
                     ->label('Merge Into…')
                     ->icon('heroicon-o-arrow-right-circle')
@@ -52,7 +52,7 @@ class VibetagResource extends Resource
                             ->searchable()
                             ->required(),
                     ])
-                    ->visible(fn () => auth()->user()->can('vibetags.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('vibetags.manage'))
                     ->action(function (Vibetag $record, array $data) {
                         $target = Vibetag::findOrFail($data['target_id']);
                         // Re-attach all rotations to target tag, avoiding duplicates
@@ -66,7 +66,7 @@ class VibetagResource extends Resource
                         Notification::make()->title("'{$record->name}' merged into '{$target->name}'")->success()->send();
                     }),
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->can('vibetags.manage'))
+                    ->visible(fn () => auth('admin')->user()?->can('vibetags.manage'))
                     ->before(function (Vibetag $record) {
                         activity()->causedBy(auth()->user())->performedOn($record)
                             ->log("Deleted vibetag: {$record->name}");

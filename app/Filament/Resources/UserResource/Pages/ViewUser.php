@@ -14,7 +14,7 @@ class ViewUser extends ViewRecord
     {
         return [
             EditAction::make()
-                ->visible(fn () => auth()->user()->can('users.edit')),
+                ->visible(fn () => auth('admin')->user()?->can('users.edit')),
         ];
     }
 }
