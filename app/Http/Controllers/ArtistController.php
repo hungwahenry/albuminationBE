@@ -52,36 +52,6 @@ class ArtistController extends Controller
             return $this->error('Artist not found.', 404);
         }
 
-        // Never synced — fetch synchronously so this request waits for the result
-        if ($artist->mbid && !$artist->albums_synced_at) {
-            $this->musicBrainz->fetchArtistAlbums($artist);
-            $artist->update(['albums_synced_at' => now()]);
-        }
-
-        $albums = $artist->albums()
-            ->orderByRaw('ISNULL(release_date), release_date DESC')
-            ->get()
-            ->map(fn (Album $album) => [
-                'mbid'          => $album->mbid,
-                'title'         => $album->title,
-                'type'          => $album->type,
-                'release_date'  => $album->release_date?->toDateString(),
-                'cover_art_url' => $album->mbid ? CoverArtService::url($album->mbid) : null,
-                'loves_count'   => $album->loves_count,
-                'takes_count'   => $album->takes_count,
-            ]);
-
-        return $this->success($albums);
-    }
-
-    public function albums(string $slug): JsonResponse
-    {
-        $artist = Artist::where('slug', $slug)->orWhere('mbid', $slug)->first();
-
-        if (!$artist) {
-            return $this->error('Artist not found.', 404);
-        }
-
         // Never synced — fetch synchronously so the caller waits for real data
         if ($artist->mbid && !$artist->albums_synced_at) {
             $this->musicBrainz->fetchArtistAlbums($artist);
