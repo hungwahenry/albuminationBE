@@ -31,6 +31,7 @@ class AdminRolesSeeder extends Seeder
         'catalog.edit',
         'catalog.featured.manage',
         'catalog.cache.flush',
+        'catalog.sync',
 
         // Content overview
         'rotations.view',
@@ -95,6 +96,7 @@ class AdminRolesSeeder extends Seeder
             'catalog.edit',
             'catalog.featured.manage',
             'catalog.cache.flush',
+            'catalog.sync',
             'rotations.view',
             'takes.view',
             'vibetags.manage',

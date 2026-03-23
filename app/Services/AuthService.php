@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\AccountDeletionCodeMail;
 use App\Mail\EmailChangeCodeMail;
 use App\Mail\LoginCodeMail;
 use App\Mail\SignupCodeMail;
@@ -102,6 +103,47 @@ class AuthService
         ]);
 
         Mail::to($newEmail)->send(new EmailChangeCodeMail($code));
+    }
+
+    public function sendAccountDeletionCode(User $user): void
+    {
+        MagicCode::where('email', $user->email)->where('type', 'account_deletion')->delete();
+
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        MagicCode::create([
+            'email'      => $user->email,
+            'code'       => Hash::make($code),
+            'type'       => 'account_deletion',
+            'expires_at' => now()->addMinutes(10),
+        ]);
+
+        Mail::to($user->email)->send(new AccountDeletionCodeMail($code));
+    }
+
+    public function confirmAccountDeletion(User $user, string $code): array
+    {
+        $magicCode = MagicCode::where('email', $user->email)
+            ->where('type', 'account_deletion')
+            ->first();
+
+        if (! $magicCode || $magicCode->isExpired()) {
+            return ['valid' => false, 'message' => 'Invalid or expired code.'];
+        }
+
+        if ($magicCode->attempts >= self::MAX_ATTEMPTS) {
+            $magicCode->delete();
+            return ['valid' => false, 'message' => 'Too many failed attempts. Please request a new code.'];
+        }
+
+        if (! Hash::check($code, $magicCode->code)) {
+            $magicCode->increment('attempts');
+            return ['valid' => false, 'message' => 'Invalid code.'];
+        }
+
+        $magicCode->delete();
+
+        return ['valid' => true];
     }
 
     public function verifyEmailChange(User $user, string $newEmail, string $code): array

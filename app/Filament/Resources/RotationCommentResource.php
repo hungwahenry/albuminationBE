@@ -96,8 +96,10 @@ class RotationCommentResource extends Resource
                         ->requiresConfirmation()
                         ->visible(fn () => auth()->user()->can('content.delete'))
                         ->action(function (Collection $records) {
+                            $count = $records->count();
                             $records->each->update(['is_deleted' => true]);
-                            Notification::make()->title("{$records->count()} comments marked as deleted")->success()->send();
+                            activity()->causedBy(auth()->user())->log("Bulk soft-deleted {$count} rotation comments");
+                            Notification::make()->title("{$count} comments marked as deleted")->success()->send();
                         }),
                     BulkAction::make('bulk_hard_delete')
                         ->label('Hard Delete Selected')
@@ -107,6 +109,7 @@ class RotationCommentResource extends Resource
                         ->visible(fn () => auth()->user()->can('content.delete'))
                         ->action(function (Collection $records) {
                             $count = $records->count();
+                            activity()->causedBy(auth()->user())->log("Bulk hard-deleted {$count} rotation comments");
                             $records->each(fn (RotationComment $r) => $r->replies()->delete() && $r->delete());
                             Notification::make()->title("{$count} comments permanently deleted")->success()->send();
                         }),

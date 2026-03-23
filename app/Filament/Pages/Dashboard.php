@@ -2,7 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\CatalogHealthWidget;
+use App\Filament\Widgets\CatalogStatsWidget;
 use App\Filament\Widgets\ContentStatsWidget;
+use App\Filament\Widgets\EngagementChartWidget;
 use App\Filament\Widgets\ModerationStatsWidget;
 use App\Filament\Widgets\TopAlbumsWidget;
 use App\Filament\Widgets\UserGrowthChartWidget;
@@ -22,6 +25,9 @@ class Dashboard extends BaseDashboard
             ModerationStatsWidget::class,
             UserGrowthChartWidget::class,
             TopAlbumsWidget::class,
+            CatalogStatsWidget::class,
+            CatalogHealthWidget::class,
+            EngagementChartWidget::class,
         ];
     }
 

@@ -12,6 +12,18 @@ class EditVibetag extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [DeleteAction::make()];
+        return [
+            DeleteAction::make()
+                ->before(function () {
+                    activity()->causedBy(auth()->user())->performedOn($this->record)
+                        ->log("Deleted vibetag: {$this->record->name}");
+                }),
+        ];
+    }
+
+    protected function afterSave(): void
+    {
+        activity()->causedBy(auth()->user())->performedOn($this->record)
+            ->log("Renamed vibetag to: {$this->record->name}");
     }
 }

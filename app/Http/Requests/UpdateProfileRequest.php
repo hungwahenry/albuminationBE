@@ -22,7 +22,7 @@ class UpdateProfileRequest extends FormRequest
             'bio'               => ['nullable', 'string', 'max:500'],
             'gender'            => ['nullable', 'string', 'in:male,female,non_binary,prefer_not_to_say'],
             'place_name'        => ['nullable', 'string', 'max:255'],
-            'avatar'            => ['nullable', 'image', 'max:2048'],
+            'avatar'            => ['nullable', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048', 'dimensions:max_width=2000,max_height=2000'],
         ];
     }
 

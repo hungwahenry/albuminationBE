@@ -88,8 +88,10 @@ class TakeReplyResource extends Resource
                         ->requiresConfirmation()
                         ->visible(fn () => auth()->user()->can('content.delete'))
                         ->action(function (Collection $records) {
+                            $count = $records->count();
                             $records->each->update(['is_deleted' => true]);
-                            Notification::make()->title("{$records->count()} replies marked as deleted")->success()->send();
+                            activity()->causedBy(auth()->user())->log("Bulk soft-deleted {$count} take replies");
+                            Notification::make()->title("{$count} replies marked as deleted")->success()->send();
                         }),
                     BulkAction::make('bulk_hard_delete')
                         ->label('Hard Delete Selected')
@@ -99,6 +101,7 @@ class TakeReplyResource extends Resource
                         ->visible(fn () => auth()->user()->can('content.delete'))
                         ->action(function (Collection $records) {
                             $count = $records->count();
+                            activity()->causedBy(auth()->user())->log("Bulk hard-deleted {$count} take replies");
                             $records->each->delete();
                             Notification::make()->title("{$count} replies permanently deleted")->success()->send();
                         }),

@@ -42,10 +42,27 @@ class AccountController extends Controller
         return $this->success(message: 'Email updated successfully.');
     }
 
+    public function sendDeletionCode(Request $request): JsonResponse
+    {
+        $this->authService->sendAccountDeletionCode($request->user());
+
+        return $this->success(message: 'Confirmation code sent to your email address.');
+    }
+
     public function deleteAccount(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $request->validate(['code' => ['required', 'string', 'size:6']]);
 
+        $result = $this->authService->confirmAccountDeletion(
+            $request->user(),
+            $request->input('code'),
+        );
+
+        if (! $result['valid']) {
+            return $this->error($result['message'], 422);
+        }
+
+        $user = $request->user();
         $user->tokens()->delete();
         $user->delete();
 

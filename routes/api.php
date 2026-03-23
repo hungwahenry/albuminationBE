@@ -34,13 +34,13 @@ Route::get('/covers', CoverController::class);
 // Public auth routes
 Route::prefix('auth')->group(function () {
     Route::post('/send-code', [AuthController::class, 'sendCode'])
-        ->middleware('throttle:5,1');
+        ->middleware('throttle:auth.send');
     Route::post('/verify-code', [AuthController::class, 'verifyCode'])
-        ->middleware('throttle:10,1');
+        ->middleware('throttle:auth.verify');
 });
 
 // Authenticated routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     // Onboarding
     Route::post('/auth/onboarding', [AuthController::class, 'completeOnboarding']);
     Route::get('/auth/user', [AuthController::class, 'user']);
@@ -49,8 +49,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Account settings (email change, delete account)
     Route::prefix('account')->group(function () {
-        Route::post('/email/send-code', [AccountController::class, 'sendEmailChangeCode'])->middleware('throttle:5,1');
+        Route::post('/email/send-code', [AccountController::class, 'sendEmailChangeCode'])->middleware('throttle:auth.send');
         Route::post('/email/verify', [AccountController::class, 'verifyEmailChange']);
+        Route::post('/delete/send-code', [AccountController::class, 'sendDeletionCode'])->middleware('throttle:auth.send');
         Route::delete('/', [AccountController::class, 'deleteAccount']);
     });
 
@@ -60,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes requiring completed onboarding
     Route::middleware('onboarding')->group(function () {
-        Route::get('/search', SearchController::class);
+        Route::get('/search', SearchController::class)->middleware('throttle:search');
 
         // Feed
         Route::prefix('feed')->group(function () {
@@ -69,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         // Giphy proxy
-        Route::prefix('giphy')->group(function () {
+        Route::prefix('giphy')->middleware('throttle:giphy')->group(function () {
             Route::get('/trending', [GiphyController::class, 'trending']);
             Route::get('/search', [GiphyController::class, 'search']);
         });
@@ -83,7 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Takes
         Route::prefix('albums/{mbid}/takes')->group(function () {
             Route::get('/', [TakeController::class, 'index']);
-            Route::post('/', [TakeController::class, 'store']);
+            Route::post('/', [TakeController::class, 'store'])->middleware('throttle:writes');
             Route::put('/{take}', [TakeController::class, 'update']);
             Route::delete('/{take}', [TakeController::class, 'destroy']);
             Route::post('/{take}/react', [TakeReactionController::class, 'react']);
@@ -98,7 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Rotations
         Route::prefix('rotations')->group(function () {
             Route::get('/', [RotationController::class, 'index']);
-            Route::post('/', [RotationController::class, 'store']);
+            Route::post('/', [RotationController::class, 'store'])->middleware('throttle:writes');
             Route::get('/{rotation}', [RotationController::class, 'show']);
             Route::put('/{rotation}', [RotationController::class, 'update']);
             Route::delete('/{rotation}', [RotationController::class, 'destroy']);
@@ -123,7 +124,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('reports')->group(function () {
             Route::get('/', [ReportController::class, 'index']);
             Route::get('/reasons', [ReportController::class, 'reasons']);
-            Route::post('/', [ReportController::class, 'store']);
+            Route::post('/', [ReportController::class, 'store'])->middleware('throttle:writes');
         });
 
         // Profile

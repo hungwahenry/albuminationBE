@@ -66,7 +66,11 @@ class VibetagResource extends Resource
                         Notification::make()->title("'{$record->name}' merged into '{$target->name}'")->success()->send();
                     }),
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->can('vibetags.manage')),
+                    ->visible(fn () => auth()->user()->can('vibetags.manage'))
+                    ->before(function (Vibetag $record) {
+                        activity()->causedBy(auth()->user())->performedOn($record)
+                            ->log("Deleted vibetag: {$record->name}");
+                    }),
             ])
             ->bulkActions([]);
     }

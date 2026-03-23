@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AlbumResource\Pages;
 use App\Filament\Resources\AlbumResource\RelationManagers\TracksRelationManager;
+use App\Jobs\SeedAlbumTracksJob;
 use App\Models\Album;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
@@ -13,11 +14,15 @@ use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class AlbumResource extends Resource
@@ -85,14 +90,32 @@ class AlbumResource extends Resource
                 TextColumn::make('release_date')->date()->sortable(),
                 TextColumn::make('takes_count')->label('Takes')->sortable(),
                 TextColumn::make('loves_count')->label('Loves')->sortable(),
+                TextColumn::make('tracks_count')
+                    ->label('Tracks')
+                    ->state(fn (Album $a) => $a->tracks()->count())
+                    ->color(fn (Album $a) => $a->tracks()->count() === 0 ? 'danger' : null),
             ])
             ->defaultSort('takes_count', 'desc')
             ->filters([
                 SelectFilter::make('type')
                     ->options(['Album' => 'Album', 'EP' => 'EP']),
+                Filter::make('no_tracks')
+                    ->label('No tracks seeded')
+                    ->query(fn (Builder $query) => $query->whereDoesntHave('tracks')),
             ])
             ->actions([
                 ViewAction::make(),
+                Action::make('seed_tracks')
+                    ->label('Seed Tracks')
+                    ->icon('heroicon-o-musical-note')
+                    ->color('info')
+                    ->visible(fn (Album $record) => $record->mbid && auth()->user()->can('catalog.sync'))
+                    ->action(function (Album $album) {
+                        SeedAlbumTracksJob::dispatch($album->id);
+                        activity()->causedBy(auth()->user())->performedOn($album)
+                            ->log("Queued track seeding for album: {$album->title}");
+                        Notification::make()->title("Track seeding queued for {$album->title}")->success()->send();
+                    }),
                 Action::make('flush_cache')
                     ->label('Flush Cache')
                     ->icon('heroicon-o-arrow-path')
@@ -110,7 +133,26 @@ class AlbumResource extends Resource
                         Notification::make()->title('Cache flushed for ' . $album->title)->success()->send();
                     }),
             ])
-            ->bulkActions([])
+            ->bulkActions([
+                BulkAction::make('seed_tracks')
+                    ->label('Seed Tracks')
+                    ->icon('heroicon-o-musical-note')
+                    ->color('info')
+                    ->visible(fn () => auth()->user()->can('catalog.sync'))
+                    ->requiresConfirmation()
+                    ->modalDescription('This will queue a track-seeding job for each selected album that is missing tracks.')
+                    ->action(function (Collection $records) {
+                        $count = 0;
+                        foreach ($records as $album) {
+                            if ($album->mbid && $album->tracks()->doesntExist()) {
+                                SeedAlbumTracksJob::dispatch($album->id);
+                                $count++;
+                            }
+                        }
+                        activity()->causedBy(auth()->user())->log("Queued track seeding for {$count} albums");
+                        Notification::make()->title("Track seeding queued for {$count} albums")->success()->send();
+                    }),
+            ])
             ->modifyQueryUsing(fn (\Illuminate\Database\Eloquent\Builder $query) => $query->with('artists'));
     }
 

@@ -208,14 +208,22 @@ class ReportResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->requiresConfirmation()
                         ->visible(fn () => auth()->user()->can('reports.action'))
-                        ->action(fn (Collection $records) => $records->each->update(['status' => 'reviewed'])),
+                        ->action(function (Collection $records) {
+                            $count = $records->count();
+                            $records->each->update(['status' => 'reviewed']);
+                            activity()->causedBy(auth()->user())->log("Bulk marked {$count} reports as reviewed");
+                        }),
                     BulkAction::make('bulk_dismiss')
                         ->label('Dismiss Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color('gray')
                         ->requiresConfirmation()
                         ->visible(fn () => auth()->user()->can('reports.action'))
-                        ->action(fn (Collection $records) => $records->each->update(['status' => 'dismissed'])),
+                        ->action(function (Collection $records) {
+                            $count = $records->count();
+                            $records->each->update(['status' => 'dismissed']);
+                            activity()->causedBy(auth()->user())->log("Bulk dismissed {$count} reports");
+                        }),
                 ]),
             ])
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['user.profile', 'reason']));
