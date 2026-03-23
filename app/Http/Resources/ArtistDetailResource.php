@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Take;
 use App\Services\CoverArtService;
@@ -17,21 +16,7 @@ class ArtistDetailResource extends JsonResource
         /** @var Artist $artist */
         $artist = $this->resource;
 
-        $albumModels = $artist->albums()
-            ->orderByRaw('ISNULL(release_date), release_date DESC')
-            ->get();
-
-        $albumIds = $albumModels->pluck('id');
-
-        $albums = $albumModels->map(fn (Album $album) => [
-            'mbid'          => $album->mbid,
-            'title'         => $album->title,
-            'type'          => $album->type,
-            'release_date'  => $album->release_date?->toDateString(),
-            'cover_art_url' => $album->mbid ? CoverArtService::url($album->mbid) : null,
-            'loves_count'   => $album->loves_count,
-            'takes_count'   => $album->takes_count,
-        ]);
+        $albumIds = $artist->albums()->pluck('id');
 
         $recentTakes = Take::whereIn('album_id', $albumIds)
             ->where('is_deleted', false)
@@ -56,27 +41,25 @@ class ArtistDetailResource extends JsonResource
                 ],
             ]);
 
-        $totalTracks = $artist->tracks()->count();
-
         return [
-            'slug'           => $artist->slug,
-            'mbid'           => $artist->mbid,
-            'name'           => $artist->name,
-            'type'           => $artist->type,
-            'country'        => $artist->country,
-            'disambiguation' => $artist->disambiguation,
-            'begin_date'     => $artist->begin_date?->toDateString(),
-            'end_date'       => $artist->end_date?->toDateString(),
-            'image_url'      => $artist->image_url,
-            'stans_count'    => $artist->stans_count,
-            'is_stanned'     => Auth::check() ? $artist->isStannedBy(Auth::id()) : false,
-            'stats'          => [
-                'total_loves'  => $albums->sum('loves_count'),
-                'total_takes'  => $albums->sum('takes_count'),
-                'total_tracks' => $totalTracks,
+            'slug'              => $artist->slug,
+            'mbid'              => $artist->mbid,
+            'name'              => $artist->name,
+            'type'              => $artist->type,
+            'country'           => $artist->country,
+            'disambiguation'    => $artist->disambiguation,
+            'begin_date'        => $artist->begin_date?->toDateString(),
+            'end_date'          => $artist->end_date?->toDateString(),
+            'image_url'         => $artist->image_url,
+            'stans_count'       => $artist->stans_count,
+            'is_stanned'        => Auth::check() ? $artist->isStannedBy(Auth::id()) : false,
+            'stats'             => [
+                'total_loves'  => $artist->albums()->sum('loves_count'),
+                'total_takes'  => $artist->albums()->sum('takes_count'),
+                'total_tracks' => $artist->tracks()->count(),
             ],
-            'recent_takes'   => $recentTakes,
-            'albums'         => $albums,
+            'recent_takes'      => $recentTakes,
+            'albums_synced_at'  => $artist->albums_synced_at?->toISOString(),
         ];
     }
 }

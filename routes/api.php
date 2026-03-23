@@ -75,6 +75,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
             Route::get('/search', [GiphyController::class, 'search']);
         });
         Route::get('/artists/{slug}', [ArtistController::class, 'show']);
+        Route::get('/artists/{slug}/albums', [ArtistController::class, 'albums']);
         Route::post('/artists/{slug}/stan', [ArtistController::class, 'stan']);
 
         Route::get('/albums/{mbid}', [AlbumController::class, 'show']);
