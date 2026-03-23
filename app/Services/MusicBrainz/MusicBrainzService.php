@@ -10,9 +10,6 @@ class MusicBrainzService
 {
     public function __construct(private MusicBrainzClient $client) {}
 
-    /**
-     * Fetch an artist from MusicBrainz by MBID and store it.
-     */
     public function fetchArtist(string $mbid): ?Artist
     {
         $data = $this->client->lookup('artist', $mbid);
@@ -24,9 +21,6 @@ class MusicBrainzService
         return $this->storeArtist($data);
     }
 
-    /**
-     * Search MusicBrainz for artists (raw results, not stored).
-     */
     public function searchArtists(string $query, int $limit = 25, int $offset = 0): ?array
     {
         return $this->client->search('artist', $query, $limit, $offset);
@@ -62,6 +56,8 @@ class MusicBrainzService
                 $limit,
                 $offset,
                 ['artist-credits'],
+                // Filter at API level: only Album/EP primary types, exclude promo/bootleg-only groups
+                ['type' => 'album|ep', 'release-group-status' => 'website-default'],
             );
 
             if (!$data || !isset($data['release-groups'])) {
@@ -69,12 +65,7 @@ class MusicBrainzService
             }
 
             foreach ($data['release-groups'] as $rg) {
-                $type = $rg['primary-type'] ?? null;
-
-                if (!in_array($type, ['Album', 'EP'], true)) {
-                    continue;
-                }
-
+                // Still skip secondary types (live albums, compilations, remixes, etc.)
                 if (!empty($rg['secondary-types'] ?? [])) {
                     continue;
                 }
@@ -113,20 +104,30 @@ class MusicBrainzService
      */
     public function fetchAlbumTracks(Album $album): void
     {
+        // Fetch official releases only — avoids promos, bootlegs, and regional oddities
         $releasesData = $this->client->browse(
             'release',
             'release-group',
             $album->mbid,
-            1,
+            100,
             0,
+            [],
+            ['status' => 'official'],
         );
 
         $releases = $releasesData['releases'] ?? [];
+
+        // Fall back to any release if no official ones found (rare, but possible for older releases)
+        if (empty($releases)) {
+            $fallback = $this->client->browse('release', 'release-group', $album->mbid, 1, 0);
+            $releases = $fallback['releases'] ?? [];
+        }
 
         if (empty($releases)) {
             return;
         }
 
+        // MB returns official releases sorted by date ascending — first is the original release
         $releaseData = $this->client->lookup(
             'release',
             $releases[0]['id'],

@@ -37,13 +37,14 @@ class MusicBrainzClient
     /**
      * Browse entities linked to another entity.
      */
-    public function browse(string $entity, string $linkedEntity, string $mbid, int $limit = 100, int $offset = 0, array $inc = []): ?array
+    public function browse(string $entity, string $linkedEntity, string $mbid, int $limit = 100, int $offset = 0, array $inc = [], array $filters = []): ?array
     {
         $params = [
             'fmt' => 'json',
             $linkedEntity => $mbid,
             'limit' => $limit,
             'offset' => $offset,
+            ...$filters,
         ];
 
         if (!empty($inc)) {
