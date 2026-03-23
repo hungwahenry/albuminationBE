@@ -71,6 +71,11 @@ class Rotation extends Model
         return $this->hasMany(RotationComment::class);
     }
 
+    public function resolveRouteBinding($value, $field = null): ?static
+    {
+        return $this->where('slug', $value)->orWhere('id', $value)->first();
+    }
+
     public function isOwnedBy(int $userId): bool
     {
         return $this->user_id === $userId;

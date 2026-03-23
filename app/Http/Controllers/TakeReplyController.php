@@ -19,7 +19,7 @@ class TakeReplyController extends Controller
 
     public function __construct(private TakeReplyService $replyService) {}
 
-    public function index(Request $request, string $mbid, Take $take): JsonResponse
+    public function index(Request $request, string $slug, Take $take): JsonResponse
     {
         $replies = $take->replies()
             ->with([
@@ -33,7 +33,7 @@ class TakeReplyController extends Controller
         return $this->success(TakeReplyResource::collection($replies)->response()->getData(true));
     }
 
-    public function store(StoreTakeReplyRequest $request, string $mbid, Take $take): JsonResponse
+    public function store(StoreTakeReplyRequest $request, string $slug, Take $take): JsonResponse
     {
         $replyToUserId = null;
         if (!empty($request->reply_to_username)) {
@@ -45,7 +45,7 @@ class TakeReplyController extends Controller
         return $this->success(new TakeReplyResource($reply), 'Reply posted', 201);
     }
 
-    public function destroy(Request $request, string $mbid, Take $take, TakeReply $reply): JsonResponse
+    public function destroy(Request $request, string $slug, Take $take, TakeReply $reply): JsonResponse
     {
         if ($reply->take_id !== $take->id) {
             return $this->error('Reply not found', 404);

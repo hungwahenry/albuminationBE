@@ -19,9 +19,9 @@ class LoveController extends Controller
 
     public function __construct(private LoveService $loveService) {}
 
-    public function toggleAlbum(Request $request, string $mbid): JsonResponse
+    public function toggleAlbum(Request $request, string $slug): JsonResponse
     {
-        $album = Album::where('mbid', $mbid)->first();
+        $album = Album::where('slug', $slug)->orWhere('mbid', $slug)->first();
 
         if (!$album) {
             return $this->error('Album not found', 404);
@@ -32,7 +32,7 @@ class LoveController extends Controller
         return $this->success($result);
     }
 
-    public function toggleReply(Request $request, string $mbid, Take $take, TakeReply $reply): JsonResponse
+    public function toggleReply(Request $request, string $slug, Take $take, TakeReply $reply): JsonResponse
     {
         if ($reply->take_id !== $take->id) {
             return $this->error('Reply not found', 404);

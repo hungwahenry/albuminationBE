@@ -14,9 +14,9 @@ class TrackFavouriteController extends Controller
 
     public function __construct(private TrackFavouriteService $service) {}
 
-    public function toggle(Request $request, string $mbid, int $trackId): JsonResponse
+    public function toggle(Request $request, string $slug, int $trackId): JsonResponse
     {
-        $track = Track::whereHas('album', fn ($q) => $q->where('mbid', $mbid))
+        $track = Track::whereHas('album', fn ($q) => $q->where('slug', $slug)->orWhere('mbid', $slug))
             ->where('id', $trackId)
             ->first();
 

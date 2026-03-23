@@ -13,9 +13,9 @@ class AlbumController extends Controller
 
     public function __construct(private AlbumService $albumService) {}
 
-    public function show(string $mbid): JsonResponse
+    public function show(string $slug): JsonResponse
     {
-        $album = $this->albumService->show($mbid);
+        $album = $this->albumService->show($slug);
 
         if (!$album) {
             return $this->error('Album not found', 404);

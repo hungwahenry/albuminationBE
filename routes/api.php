@@ -78,12 +78,12 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::get('/artists/{slug}/albums', [ArtistController::class, 'albums']);
         Route::post('/artists/{slug}/stan', [ArtistController::class, 'stan']);
 
-        Route::get('/albums/{mbid}', [AlbumController::class, 'show']);
-        Route::post('/albums/{mbid}/love', [LoveController::class, 'toggleAlbum']);
-        Route::post('/albums/{mbid}/tracks/{track}/favourite', [TrackFavouriteController::class, 'toggle']);
+        Route::get('/albums/{slug}', [AlbumController::class, 'show']);
+        Route::post('/albums/{slug}/love', [LoveController::class, 'toggleAlbum']);
+        Route::post('/albums/{slug}/tracks/{track}/favourite', [TrackFavouriteController::class, 'toggle']);
 
         // Takes
-        Route::prefix('albums/{mbid}/takes')->group(function () {
+        Route::prefix('albums/{slug}/takes')->group(function () {
             Route::get('/', [TakeController::class, 'index']);
             Route::post('/', [TakeController::class, 'store'])->middleware('throttle:writes');
             Route::put('/{take}', [TakeController::class, 'update']);

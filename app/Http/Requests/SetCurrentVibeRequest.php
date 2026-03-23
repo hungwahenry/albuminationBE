@@ -15,7 +15,7 @@ class SetCurrentVibeRequest extends FormRequest
     {
         return [
             'type' => ['nullable', 'string', 'in:album,track'],
-            'mbid' => ['nullable', 'string', 'max:36'],
+            'mbid' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

@@ -4,21 +4,29 @@ namespace App\Services;
 
 use App\Models\Album;
 use App\Services\MusicBrainz\MusicBrainzService;
+use Illuminate\Support\Str;
 
 class AlbumService
 {
     public function __construct(private MusicBrainzService $musicBrainz) {}
 
     /**
-     * Find an album by MBID, fetching from MusicBrainz if not stored locally.
+     * Find an album by slug or MBID, fetching from MusicBrainz if not stored locally.
      * Also fetches tracks if the album has none.
      */
-    public function show(string $mbid): ?Album
+    public function show(string $slug): ?Album
     {
-        $album = Album::with(['artists', 'tracks.artists'])->where('mbid', $mbid)->first();
+        $album = Album::with(['artists', 'tracks.artists'])
+            ->where('slug', $slug)
+            ->orWhere('mbid', $slug)
+            ->first();
 
         if (!$album) {
-            $album = $this->musicBrainz->fetchAlbum($mbid);
+            if (!Str::isUuid($slug)) {
+                return null;
+            }
+
+            $album = $this->musicBrainz->fetchAlbum($slug);
 
             if (!$album) {
                 return null;

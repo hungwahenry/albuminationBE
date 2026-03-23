@@ -19,14 +19,14 @@ class TakeController extends Controller
 
     public function __construct(private TakeService $takeService) {}
 
-    private function findAlbum(string $mbid): ?Album
+    private function findAlbum(string $slug): ?Album
     {
-        return Album::where('mbid', $mbid)->first();
+        return Album::where('slug', $slug)->orWhere('mbid', $slug)->first();
     }
 
-    public function index(Request $request, string $mbid): JsonResponse
+    public function index(Request $request, string $slug): JsonResponse
     {
-        $album = $this->findAlbum($mbid);
+        $album = $this->findAlbum($slug);
 
         if (!$album) {
             return $this->error('Album not found', 404);
@@ -43,9 +43,9 @@ class TakeController extends Controller
         return $this->success(TakeResource::collection($takes)->response()->getData(true));
     }
 
-    public function store(StoreTakeRequest $request, string $mbid): JsonResponse
+    public function store(StoreTakeRequest $request, string $slug): JsonResponse
     {
-        $album = $this->findAlbum($mbid);
+        $album = $this->findAlbum($slug);
 
         if (!$album) {
             return $this->error('Album not found', 404);
@@ -56,9 +56,9 @@ class TakeController extends Controller
         return $this->success(new TakeResource($take), 'Take posted', 201);
     }
 
-    public function update(UpdateTakeRequest $request, string $mbid, Take $take): JsonResponse
+    public function update(UpdateTakeRequest $request, string $slug, Take $take): JsonResponse
     {
-        $album = $this->findAlbum($mbid);
+        $album = $this->findAlbum($slug);
 
         if (!$album || $take->album_id !== $album->id) {
             return $this->error('Take not found', 404);
@@ -71,9 +71,9 @@ class TakeController extends Controller
         return $this->success(new TakeResource($take));
     }
 
-    public function destroy(Request $request, string $mbid, Take $take): JsonResponse
+    public function destroy(Request $request, string $slug, Take $take): JsonResponse
     {
-        $album = $this->findAlbum($mbid);
+        $album = $this->findAlbum($slug);
 
         if (!$album || $take->album_id !== $album->id) {
             return $this->error('Take not found', 404);

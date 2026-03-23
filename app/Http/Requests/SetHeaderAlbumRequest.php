@@ -14,7 +14,7 @@ class SetHeaderAlbumRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'mbid' => ['nullable', 'string', 'max:36'],
+            'mbid' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

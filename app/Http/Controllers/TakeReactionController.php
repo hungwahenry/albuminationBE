@@ -14,7 +14,7 @@ class TakeReactionController extends Controller
 
     public function __construct(private TakeReactionService $reactionService) {}
 
-    public function react(TakeReactionRequest $request, string $mbid, Take $take): JsonResponse
+    public function react(TakeReactionRequest $request, string $slug, Take $take): JsonResponse
     {
         $result = $this->reactionService->react($request->user(), $take, $request->type);
 
