@@ -16,7 +16,7 @@ class ArtistDetailResource extends JsonResource
         /** @var Artist $artist */
         $artist = $this->resource;
 
-        $albumIds = $artist->albums()->pluck('id');
+        $albumIds = $artist->albums()->pluck('albums.id');
 
         $recentTakes = Take::whereIn('album_id', $albumIds)
             ->where('is_deleted', false)
