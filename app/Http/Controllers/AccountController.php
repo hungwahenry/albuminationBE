@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SendEmailChangeCodeRequest;
 use App\Http\Requests\VerifyEmailChangeRequest;
+use App\Models\MagicCode;
 use App\Services\AuthService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -63,7 +64,9 @@ class AccountController extends Controller
         }
 
         $user = $request->user();
+        $user->notifications()->delete();
         $user->tokens()->delete();
+        MagicCode::where('email', $user->email)->delete();
         $user->delete();
 
         return $this->success(message: 'Account deleted.');

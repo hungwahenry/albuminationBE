@@ -91,7 +91,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
             // Replies
             Route::get('/{take}/replies', [TakeReplyController::class, 'index']);
-            Route::post('/{take}/replies', [TakeReplyController::class, 'store']);
+            Route::post('/{take}/replies', [TakeReplyController::class, 'store'])->middleware('throttle:writes');
             Route::delete('/{take}/replies/{reply}', [TakeReplyController::class, 'destroy']);
             Route::post('/{take}/replies/{reply}/love', [LoveController::class, 'toggleReply']);
         });
@@ -114,7 +114,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
             // Comments
             Route::get('/{rotation}/comments', [RotationCommentController::class, 'index']);
-            Route::post('/{rotation}/comments', [RotationCommentController::class, 'store']);
+            Route::post('/{rotation}/comments', [RotationCommentController::class, 'store'])->middleware('throttle:writes');
             Route::get('/{rotation}/comments/{comment}/replies', [RotationCommentController::class, 'replies']);
             Route::delete('/{rotation}/comments/{comment}', [RotationCommentController::class, 'destroy']);
             Route::post('/{rotation}/comments/{comment}/love', [LoveController::class, 'toggleComment']);
