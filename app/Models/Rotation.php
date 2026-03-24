@@ -6,8 +6,8 @@ use App\Traits\Loveable;
 use App\Traits\Reportable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -58,9 +58,9 @@ class Rotation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function vibetags(): BelongsToMany
+    public function vibetags(): MorphToMany
     {
-        return $this->belongsToMany(Vibetag::class);
+        return $this->morphToMany(Vibetag::class, 'taggable');
     }
 
     public function items(): HasMany

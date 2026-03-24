@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Vibetag extends Model
 {
@@ -16,8 +16,8 @@ class Vibetag extends Model
         ];
     }
 
-    public function rotations(): BelongsToMany
+    public function rotations(): MorphToMany
     {
-        return $this->belongsToMany(Rotation::class);
+        return $this->morphedByMany(Rotation::class, 'taggable');
     }
 }
