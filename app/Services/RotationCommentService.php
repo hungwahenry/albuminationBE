@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\RotationCommentCreated;
+use App\Models\Profile;
 use App\Models\Rotation;
 use App\Models\RotationComment;
 use App\Models\User;
@@ -28,6 +29,8 @@ class RotationCommentService
                 RotationComment::where('id', $parentId)->increment('replies_count');
             }
 
+            $user->profile->increment('comments_count');
+
             $comment->load(['user.profile', 'replyToUser.profile', 'rotation.user']);
 
             $replyToUser = $comment->replyToUser;
@@ -47,6 +50,8 @@ class RotationCommentService
             if ($comment->parent_id) {
                 RotationComment::where('id', $comment->parent_id)->decrement('replies_count');
             }
+
+            Profile::where('user_id', $comment->user_id)->decrement('comments_count');
         });
     }
 }

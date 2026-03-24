@@ -25,7 +25,10 @@ class Artist extends Model
         'end_date',
         'image_url',
         'stans_count',
+        'albums_count',
+        'takes_count',
         'albums_synced_at',
+        'views_count',
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -42,6 +45,10 @@ class Artist extends Model
             'begin_date' => 'date',
             'end_date' => 'date',
             'albums_synced_at' => 'datetime',
+            'stans_count'  => 'integer',
+            'albums_count' => 'integer',
+            'takes_count'  => 'integer',
+            'views_count'  => 'integer',
         ];
     }
 

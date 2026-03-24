@@ -26,6 +26,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UsernameController;
+use App\Http\Controllers\ViewController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -75,10 +76,12 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
             Route::get('/search', [GiphyController::class, 'search']);
         });
         Route::get('/artists/{slug}', [ArtistController::class, 'show']);
+        Route::post('/artists/{slug}/view', [ViewController::class, 'storeArtistView']);
         Route::get('/artists/{slug}/albums', [ArtistController::class, 'albums']);
         Route::post('/artists/{slug}/stan', [ArtistController::class, 'stan']);
 
         Route::get('/albums/{slug}', [AlbumController::class, 'show']);
+        Route::post('/albums/{slug}/view', [ViewController::class, 'storeAlbumView']);
         Route::post('/albums/{slug}/love', [LoveController::class, 'toggleAlbum']);
         Route::post('/albums/{slug}/tracks/{track}/favourite', [TrackFavouriteController::class, 'toggle']);
 
@@ -112,6 +115,9 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
             // Love
             Route::post('/{rotation}/love', [LoveController::class, 'toggleRotation']);
+
+            // Views
+            Route::post('/{rotation}/view', [ViewController::class, 'storeRotationView']);
 
             // Comments
             Route::get('/{rotation}/comments', [RotationCommentController::class, 'index']);
@@ -155,6 +161,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         // Users (public profiles)
         Route::prefix('users/{username}')->group(function () {
             Route::get('/', [ProfileController::class, 'show']);
+            Route::post('/view', [ViewController::class, 'storeProfileView']);
             Route::get('/rotations', [ProfileController::class, 'rotations']);
             Route::get('/takes', [ProfileController::class, 'takes']);
             Route::post('/follow', [FollowController::class, 'toggle']);

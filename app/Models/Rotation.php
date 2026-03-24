@@ -28,6 +28,7 @@ class Rotation extends Model
         'items_count',
         'loves_count',
         'comments_count',
+        'views_count',
         'published_at',
     ];
 
@@ -47,6 +48,7 @@ class Rotation extends Model
             'items_count' => 'integer',
             'loves_count' => 'integer',
             'comments_count' => 'integer',
+            'views_count' => 'integer',
             'published_at' => 'datetime',
         ];
     }
@@ -73,7 +75,7 @@ class Rotation extends Model
 
     public function resolveRouteBinding($value, $field = null): ?static
     {
-        return $this->where('slug', $value)->orWhere('id', $value)->first();
+        return $this->where('slug', $value)->first();
     }
 
     public function isOwnedBy(int $userId): bool

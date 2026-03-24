@@ -188,12 +188,19 @@ class MusicBrainzService
             ],
         );
 
-        $this->syncArtistCredits($album, $data['artist-credit'] ?? []);
+        $isNew = $album->wasRecentlyCreated;
+
+        $artistIds = $this->syncArtistCredits($album, $data['artist-credit'] ?? []);
+
+        // Increment albums_count only when the album is first stored
+        if ($isNew && !empty($artistIds)) {
+            Artist::whereIn('id', $artistIds)->increment('albums_count');
+        }
 
         return $album;
     }
 
-    public function syncArtistCredits(Album|Track $entity, array $credits): void
+    public function syncArtistCredits(Album|Track $entity, array $credits): array
     {
         $pivotData = [];
 
@@ -222,6 +229,8 @@ class MusicBrainzService
         if (!empty($pivotData)) {
             $entity->artists()->syncWithoutDetaching($pivotData);
         }
+
+        return array_keys($pivotData);
     }
 
     private function parsePartialDate(?string $date): ?string

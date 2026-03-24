@@ -25,6 +25,8 @@ class Album extends Model
         'takes_count',
         'hits_count',
         'misses_count',
+        'rotations_count',
+        'views_count',
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -39,10 +41,12 @@ class Album extends Model
     {
         return [
             'release_date' => 'date',
-            'loves_count'  => 'integer',
-            'takes_count'  => 'integer',
-            'hits_count'   => 'integer',
-            'misses_count' => 'integer',
+            'loves_count'     => 'integer',
+            'takes_count'     => 'integer',
+            'hits_count'      => 'integer',
+            'misses_count'    => 'integer',
+            'rotations_count' => 'integer',
+            'views_count'     => 'integer',
         ];
     }
 

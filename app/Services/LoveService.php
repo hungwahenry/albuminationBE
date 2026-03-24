@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\ContentLoved;
 use App\Models\Love;
+use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -21,9 +22,16 @@ class LoveService
                 ->where('loveable_id', $loveable->getKey())
                 ->first();
 
+            $ownerId = $loveable->getAttribute('user_id');
+
             if ($existing) {
                 $existing->delete();
                 $loveable->decrement('loves_count');
+
+                // Decrement loves_received_count on the owner's profile (exclude self-loves)
+                if ($ownerId && $ownerId !== $user->id) {
+                    Profile::where('user_id', $ownerId)->decrement('loves_received_count');
+                }
 
                 return [
                     'loved'       => false,
@@ -38,6 +46,11 @@ class LoveService
             ]);
 
             $loveable->increment('loves_count');
+
+            // Increment loves_received_count on the owner's profile (exclude self-loves)
+            if ($ownerId && $ownerId !== $user->id) {
+                Profile::where('user_id', $ownerId)->increment('loves_received_count');
+            }
 
             ContentLoved::dispatch($user, $loveable);
 

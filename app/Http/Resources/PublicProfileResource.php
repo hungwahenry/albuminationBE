@@ -37,10 +37,14 @@ class PublicProfileResource extends JsonResource
             'bio'             => $profile->bio,
             'gender'          => $profile->gender,
             'location'        => $profile->place_name,
-            'followers_count' => $profile->followers_count,
-            'following_count' => $profile->following_count,
-            'rotations_count' => $profile->rotations_count,
-            'takes_count'     => $profile->takes_count,
+            'followers_count'     => $profile->followers_count,
+            'following_count'     => $profile->following_count,
+            'rotations_count'     => $profile->rotations_count,
+            'takes_count'         => $profile->takes_count,
+            'loves_received_count' => $profile->loves_received_count ?? 0,
+            'comments_count'      => $profile->comments_count ?? 0,
+            'stans_count'         => $profile->stans_count ?? 0,
+            'views_count'         => $profile->views_count ?? 0,
             'is_following'    => $isOther
                 ? $request->user()->isFollowing($user->id)
                 : false,

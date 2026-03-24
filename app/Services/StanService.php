@@ -20,6 +20,7 @@ class StanService
             if ($isStanned) {
                 $artist->stans()->detach($user->id);
                 $artist->decrement('stans_count');
+                $user->profile->decrement('stans_count');
 
                 return [
                     'is_stanned'  => false,
@@ -29,6 +30,7 @@ class StanService
 
             $artist->stans()->attach($user->id);
             $artist->increment('stans_count');
+            $user->profile->increment('stans_count');
 
             StanCreated::dispatch($user, $artist);
 

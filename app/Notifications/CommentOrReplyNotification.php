@@ -19,6 +19,7 @@ class CommentOrReplyNotification extends Notification implements ShouldQueue
         private readonly string $kind,
         private readonly ?string $excerpt = null,
         private readonly ?string $albumMbid = null,
+        private readonly ?string $contextSlug = null,
     ) {
     }
 
@@ -56,6 +57,7 @@ class CommentOrReplyNotification extends Notification implements ShouldQueue
             'type' => $this->kind === 'reply' ? 'reply' : 'comment',
             'context_type' => $this->contextType,
             'context_id' => $this->contextId,
+            'context_slug' => $this->contextSlug,
             'kind' => $this->kind,
             'excerpt' => $this->excerpt,
             'album_mbid' => $this->albumMbid,

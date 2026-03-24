@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Album;
+use App\Models\Artist;
 use App\Models\Take;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +31,9 @@ class TakeService
             $album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
 
             $user->profile->increment('takes_count');
+
+            Artist::whereIn('id', $album->artists()->pluck('artists.id'))
+                ->increment('takes_count');
 
             return $take->load('user.profile');
         });
@@ -75,6 +79,9 @@ class TakeService
             }
 
             $take->user->profile->decrement('takes_count');
+
+            Artist::whereIn('id', $take->album->artists()->pluck('artists.id'))
+                ->decrement('takes_count');
         });
     }
 }

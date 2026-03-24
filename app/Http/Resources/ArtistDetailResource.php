@@ -52,6 +52,7 @@ class ArtistDetailResource extends JsonResource
             'end_date'          => $artist->end_date?->toDateString(),
             'image_url'         => $artist->image_url,
             'stans_count'       => $artist->stans_count ?? 0,
+            'views_count'       => $artist->views_count ?? 0,
             'is_stanned'        => Auth::check() ? $artist->isStannedBy(Auth::id()) : false,
             'stats'             => [
                 'total_loves'  => (int) ($artist->albums()->sum('loves_count') ?? 0),

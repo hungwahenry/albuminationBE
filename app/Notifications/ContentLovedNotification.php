@@ -75,16 +75,23 @@ class ContentLovedNotification extends Notification implements ShouldQueue
     public static function resolveContext(Model $loveable): array
     {
         if ($loveable instanceof Rotation) {
-            return ['rotation', $loveable->id, $loveable->title, "likes:rotation:{$loveable->id}", []];
+            return ['rotation', $loveable->id, $loveable->title, "likes:rotation:{$loveable->id}", [
+                'rotation_slug' => $loveable->slug,
+            ]];
         }
 
         if ($loveable instanceof RotationComment) {
+            $loveable->loadMissing('rotation');
+
             return [
                 'rotation_comment',
                 $loveable->id,
                 Str::limit(trim((string) $loveable->body), 140),
                 "likes:rotation_comment:{$loveable->id}",
-                ['rotation_id' => $loveable->rotation_id],
+                [
+                    'rotation_id'   => $loveable->rotation_id,
+                    'rotation_slug' => $loveable->rotation?->slug,
+                ],
             ];
         }
 

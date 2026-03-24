@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\RotationPublished;
+use App\Models\Album;
 use App\Models\Profile;
 use App\Models\Rotation;
 use App\Models\User;
@@ -104,6 +105,12 @@ class RotationService
         DB::transaction(function () use ($rotation) {
             if ($rotation->status === 'published') {
                 $rotation->user->profile->decrement('rotations_count');
+            }
+
+            // Decrement rotations_count on albums before items are cascade-deleted at DB level
+            $albumIds = $rotation->items()->whereNotNull('album_id')->pluck('album_id');
+            if ($albumIds->isNotEmpty()) {
+                Album::whereIn('id', $albumIds)->decrement('rotations_count');
             }
 
             // Clear any profiles that have this rotation pinned

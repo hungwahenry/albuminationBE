@@ -25,6 +25,10 @@ class Profile extends Model
         'following_count',
         'rotations_count',
         'takes_count',
+        'loves_received_count',
+        'comments_count',
+        'stans_count',
+        'views_count',
         'header_album_id',
         'pinned_rotation_id',
         'current_vibe_type',
@@ -40,6 +44,10 @@ class Profile extends Model
             'following_count' => 'integer',
             'rotations_count' => 'integer',
             'takes_count' => 'integer',
+            'loves_received_count' => 'integer',
+            'comments_count' => 'integer',
+            'stans_count'  => 'integer',
+            'views_count'  => 'integer',
         ];
     }
 

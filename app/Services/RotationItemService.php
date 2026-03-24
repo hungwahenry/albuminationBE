@@ -43,6 +43,7 @@ class RotationItemService
             ]);
 
             $rotation->increment('items_count');
+            $album->increment('rotations_count');
 
             return $item->load('album.artists');
         });
@@ -85,6 +86,7 @@ class RotationItemService
     public function remove(Rotation $rotation, RotationItem $item): void
     {
         DB::transaction(function () use ($rotation, $item) {
+            $albumId = $item->album_id;
             $removedPosition = $item->position;
             $item->delete();
 
@@ -93,6 +95,10 @@ class RotationItemService
                 ->decrement('position');
 
             $rotation->decrement('items_count');
+
+            if ($albumId) {
+                Album::where('id', $albumId)->decrement('rotations_count');
+            }
         });
     }
 
