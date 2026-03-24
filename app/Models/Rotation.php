@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Loveable;
 use App\Traits\Reportable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -76,6 +77,13 @@ class Rotation extends Model
     public function resolveRouteBinding($value, $field = null): ?static
     {
         return $this->where('slug', $value)->first();
+    }
+
+    public function scopeByRelevance(Builder $query): Builder
+    {
+        return $query->orderByRaw(
+            '(loves_count * 3 + comments_count) / POW(TIMESTAMPDIFF(DAY, published_at, NOW()) + 1, 0.8) DESC'
+        );
     }
 
     public function isOwnedBy(int $userId): bool
