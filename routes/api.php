@@ -27,6 +27,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UsernameController;
 use App\Http\Controllers\ViewController;
+use App\Http\Controllers\VibetagController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -156,6 +157,12 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
             Route::put('/header-album', [ProfileCustomizationController::class, 'setHeaderAlbum']);
             Route::put('/pinned-rotation', [ProfileCustomizationController::class, 'setPinnedRotation']);
             Route::put('/current-vibe', [ProfileCustomizationController::class, 'setCurrentVibe']);
+        });
+
+        // Vibetags
+        Route::prefix('vibetags/{name}')->group(function () {
+            Route::get('/', [VibetagController::class, 'show']);
+            Route::get('/rotations', [VibetagController::class, 'rotations']);
         });
 
         // Users (public profiles)
