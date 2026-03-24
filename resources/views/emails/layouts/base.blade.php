@@ -4,64 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') — Albumination</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f5;
-            color: #1a1a1a;
-        }
-        .email-wrapper {
-            max-width: 560px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-        .email-card {
             background-color: #ffffff;
-            border-radius: 12px;
-            padding: 40px 32px;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #111111;
+            -webkit-font-smoothing: antialiased;
         }
-        .email-logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 32px;
+        .wrapper {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 48px 24px;
         }
-        .email-code {
-            font-size: 36px;
-            font-weight: 700;
-            letter-spacing: 8px;
-            color: #1a1a1a;
-            text-align: center;
-            padding: 20px 0;
-            background-color: #f4f4f5;
-            border-radius: 8px;
-            margin: 24px 0;
+        .logo {
+            margin-bottom: 40px;
+        }
+        .logo img {
+            height: 26px;
+            width: auto;
+        }
+        .content {
+            padding-bottom: 40px;
+            border-bottom: 1px solid #f0f0f0;
         }
         .email-text {
             font-size: 15px;
-            line-height: 1.6;
-            color: #4a4a4a;
-            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #555555;
+            margin: 0 0 16px;
+        }
+        .email-code {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 10px;
+            color: #111111;
+            background-color: #f7f7f7;
+            border-radius: 8px;
+            padding: 20px 24px;
+            text-align: center;
+            margin: 24px 0;
         }
         .email-footer {
-            text-align: center;
-            font-size: 13px;
-            color: #9a9a9a;
-            margin-top: 32px;
+            padding-top: 24px;
+            font-size: 12px;
+            color: #aaaaaa;
+            margin: 0;
+        }
+        .email-footer a {
+            color: #aaaaaa;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div class="email-wrapper">
-        <div class="email-card">
-            <div class="email-logo">Albumination</div>
+    <div class="wrapper">
+        <div class="logo">
+            <img src="https://albumination.com/wordmark-dark.png" alt="Albumination" />
+        </div>
+        <div class="content">
             @yield('content')
         </div>
-        <div class="email-footer">
-            <p>&copy; {{ date('Y') }} Albumination. All rights reserved.</p>
-        </div>
+        <p class="email-footer">
+            &copy; {{ date('Y') }} Albumination &middot;
+            <a href="https://albumination.com/privacy">Privacy</a> &middot;
+            <a href="https://albumination.com/terms">Terms</a>
+        </p>
     </div>
 </body>
 </html>
