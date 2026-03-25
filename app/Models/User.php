@@ -52,7 +52,7 @@ class User extends Authenticatable
 
     public function favouriteTracks(): BelongsToMany
     {
-        return $this->belongsToMany(Track::class, 'track_favourites');
+        return $this->belongsToMany(Track::class, 'track_favourites')->using(TrackFavourite::class);
     }
 
     public function rotations(): HasMany
@@ -116,6 +116,19 @@ class User extends Authenticatable
     public function blockedBy(): HasMany
     {
         return $this->hasMany(Block::class, 'blocked_user_id');
+    }
+
+    public function badges(): BelongsToMany
+    {
+        return $this->belongsToMany(Badge::class, 'user_badges')
+            ->withPivot('earned_at')
+            ->withTimestamps()
+            ->orderByPivot('earned_at', 'desc');
+    }
+
+    public function hasBadge(int $badgeId): bool
+    {
+        return $this->badges()->where('badge_id', $badgeId)->exists();
     }
 
     public function hasBlocked(int $userId): bool

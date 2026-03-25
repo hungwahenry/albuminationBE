@@ -27,6 +27,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\UsernameController;
 use App\Http\Controllers\ViewController;
+use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\VibetagController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,6 +57,10 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::post('/delete/send-code', [AccountController::class, 'sendDeletionCode'])->middleware('throttle:auth.send');
         Route::delete('/', [AccountController::class, 'deleteAccount']);
     });
+
+    // Badges
+    Route::get('/me/badges', [BadgeController::class, 'mine']);
+    Route::get('/users/{username}/badges', [BadgeController::class, 'forUser']);
 
     // Data export
     Route::get('/account/export', ExportController::class);

@@ -2,13 +2,23 @@
 
 namespace App\Providers;
 
+use App\Events\BadgeEarned;
 use App\Events\ContentLoved;
 use App\Events\FollowCreated;
 use App\Events\ReportResolved;
 use App\Events\RotationCommentCreated;
 use App\Events\RotationPublished;
+use App\Events\StanCreated;
 use App\Events\TakeReactionChanged;
 use App\Events\TakeReplyCreated;
+use App\Listeners\EvaluateBadgesOnContentLoved;
+use App\Listeners\EvaluateBadgesOnFollowCreated;
+use App\Listeners\EvaluateBadgesOnRotationCommentCreated;
+use App\Listeners\EvaluateBadgesOnRotationPublished;
+use App\Listeners\EvaluateBadgesOnStanCreated;
+use App\Listeners\EvaluateBadgesOnTakeReactionChanged;
+use App\Listeners\EvaluateBadgesOnTakeReplyCreated;
+use App\Listeners\SendBadgeEarnedNotification;
 use App\Listeners\SendContentLovedNotifications;
 use App\Listeners\SendFollowNotifications;
 use App\Listeners\SendReportResolvedNotifications;
@@ -20,33 +30,36 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * The event to listener mappings for the application.
-     *
-     * @var array<class-string, array<int, class-string>>
-     */
     protected $listen = [
         FollowCreated::class => [
             SendFollowNotifications::class,
+            EvaluateBadgesOnFollowCreated::class,
         ],
         TakeReplyCreated::class => [
             SendTakeReplyNotifications::class,
+            EvaluateBadgesOnTakeReplyCreated::class,
         ],
         RotationCommentCreated::class => [
             SendRotationCommentNotifications::class,
+            EvaluateBadgesOnRotationCommentCreated::class,
         ],
         RotationPublished::class => [
             SendRotationPublishedNotifications::class,
+            EvaluateBadgesOnRotationPublished::class,
         ],
         ContentLoved::class => [
             SendContentLovedNotifications::class,
+            EvaluateBadgesOnContentLoved::class,
         ],
         TakeReactionChanged::class => [
             SendTakeReactionNotifications::class,
+            EvaluateBadgesOnTakeReactionChanged::class,
         ],
-        ReportResolved::class => [
-            SendReportResolvedNotifications::class,
+        StanCreated::class => [
+            EvaluateBadgesOnStanCreated::class,
+        ],
+        BadgeEarned::class => [
+            SendBadgeEarnedNotification::class,
         ],
     ];
 }
-

@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             AppConfigSeeder::class,
             FeedSectionSeeder::class,
             NotificationTypeSeeder::class,
+            BadgeSeeder::class,
         ]);
     }
 }

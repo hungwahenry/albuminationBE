@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Take;
+use App\Models\TrackFavourite;
+use App\Observers\TakeObserver;
+use App\Observers\TrackFavouriteObserver;
 use App\Services\MusicBrainz\MusicBrainzClient;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -23,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Take::observe(TakeObserver::class);
+        TrackFavourite::observe(TrackFavouriteObserver::class);
+
         // Global authenticated API — 120 requests/minute per user
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(120)->by($request->user()?->id ?: $request->ip());

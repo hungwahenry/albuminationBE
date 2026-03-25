@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Track;
+use App\Models\TrackFavourite;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +20,7 @@ class TrackFavouriteService
                 return ['is_favourited' => false, 'favourites_count' => max(0, $track->favourites_count)];
             }
 
-            $user->favouriteTracks()->attach($track->id);
+            TrackFavourite::create(['user_id' => $user->id, 'track_id' => $track->id]);
             $track->increment('favourites_count');
             return ['is_favourited' => true, 'favourites_count' => $track->favourites_count];
         });
