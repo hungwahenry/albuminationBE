@@ -27,6 +27,7 @@ class Album extends Model
         'misses_count',
         'rotations_count',
         'views_count',
+        'seeded_by_user_id',
     ];
 
     public function getSlugOptions(): SlugOptions

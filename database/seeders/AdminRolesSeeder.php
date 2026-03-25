@@ -38,6 +38,9 @@ class AdminRolesSeeder extends Seeder
         'takes.view',
         'vibetags.manage',
 
+        // Badges
+        'badges.manage',
+
         // Feed
         'feed.manage',
 

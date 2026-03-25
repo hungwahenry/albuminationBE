@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Profile;
 use App\Models\Take;
 use App\Models\TrackFavourite;
+use App\Observers\ProfileObserver;
 use App\Observers\TakeObserver;
 use App\Observers\TrackFavouriteObserver;
 use App\Services\MusicBrainz\MusicBrainzClient;
@@ -29,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Take::observe(TakeObserver::class);
         TrackFavourite::observe(TrackFavouriteObserver::class);
+        Profile::observe(ProfileObserver::class);
 
         // Global authenticated API — 120 requests/minute per user
         RateLimiter::for('api', function (Request $request) {

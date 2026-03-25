@@ -6,6 +6,7 @@ use App\Http\Resources\AlbumResource;
 use App\Services\AlbumService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AlbumController extends Controller
 {
@@ -13,9 +14,9 @@ class AlbumController extends Controller
 
     public function __construct(private AlbumService $albumService) {}
 
-    public function show(string $slug): JsonResponse
+    public function show(Request $request, string $slug): JsonResponse
     {
-        $album = $this->albumService->show($slug);
+        $album = $this->albumService->show($slug, $request->user());
 
         if (!$album) {
             return $this->error('Album not found', 404);

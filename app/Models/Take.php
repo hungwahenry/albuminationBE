@@ -36,15 +36,21 @@ class Take extends Model
         return $this->hasMany(TakeReaction::class);
     }
 
+    public function agrees(): HasMany
+    {
+        return $this->hasMany(TakeReaction::class)->where('type', 'agree');
+    }
+
+    public function disagrees(): HasMany
+    {
+        return $this->hasMany(TakeReaction::class)->where('type', 'disagree');
+    }
+
     public function replies(): HasMany
     {
         return $this->hasMany(TakeReply::class);
     }
 
-    /**
-     * Returns the authenticated user's reaction type, or null.
-     * Uses loaded relation when available to avoid N+1.
-     */
     public function getUserReaction(int $userId): ?string
     {
         if ($this->relationLoaded('reactions')) {

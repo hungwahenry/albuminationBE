@@ -15,7 +15,7 @@ class ProfileCustomizationService
         $albumId = null;
 
         if ($mbid) {
-            $album = $this->albumService->show($mbid);
+            $album = $this->albumService->show($mbid, $user);
             $albumId = $album?->id;
         }
 
@@ -38,7 +38,7 @@ class ProfileCustomizationService
 
         if ($type && $mbid) {
             if ($type === 'album') {
-                $album = $this->albumService->show($mbid);
+                $album = $this->albumService->show($mbid, $user);
                 $vibeType = $album ? Album::class : null;
                 $vibeId = $album?->id;
             } elseif ($type === 'track') {

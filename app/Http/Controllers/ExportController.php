@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\EvaluateBadgesJob;
 use App\Services\ExportService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,7 +13,10 @@ class ExportController extends Controller
 
     public function __invoke(Request $request): Response
     {
-        $export = $this->exportService->build($request->user(), $request);
+        $user = $request->user();
+        $export = $this->exportService->build($user, $request);
+
+        EvaluateBadgesJob::dispatch('data_exported', $user->id);
 
         $filename = 'albumination-export-' . now()->format('Y-m-d') . '.json';
 

@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Jobs\EvaluateBadgesJob;
 use App\Models\Album;
+use App\Models\User;
 use App\Services\MusicBrainz\MusicBrainzService;
 use Illuminate\Support\Str;
 
@@ -14,7 +16,7 @@ class AlbumService
      * Find an album by slug or MBID, fetching from MusicBrainz if not stored locally.
      * Also fetches tracks if the album has none.
      */
-    public function show(string $slug): ?Album
+    public function show(string $slug, ?User $seedingUser = null): ?Album
     {
         $album = Album::with(['artists', 'tracks.artists'])
             ->where('slug', $slug)
@@ -30,6 +32,11 @@ class AlbumService
 
             if (!$album) {
                 return null;
+            }
+
+            if ($album->wasRecentlyCreated && $seedingUser) {
+                $album->update(['seeded_by_user_id' => $seedingUser->id]);
+                EvaluateBadgesJob::dispatch('album_seeded', $seedingUser->id, Album::class, $album->id);
             }
         }
 

@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             FeedSectionSeeder::class,
             NotificationTypeSeeder::class,
             BadgeSeeder::class,
+            BadgeRaritySeeder::class,
         ]);
     }
 }

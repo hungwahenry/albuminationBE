@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Album;
+use App\Models\RotationComment;
 use App\Traits\Reportable;
 use App\Models\Report;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -106,6 +108,16 @@ class User extends Authenticatable
     public function stannedArtists(): BelongsToMany
     {
         return $this->belongsToMany(Artist::class, 'artist_stans');
+    }
+
+    public function rotationComments(): HasMany
+    {
+        return $this->hasMany(RotationComment::class);
+    }
+
+    public function seededAlbums(): HasMany
+    {
+        return $this->hasMany(Album::class, 'seeded_by_user_id');
     }
 
     public function reportsAgainst(): MorphMany

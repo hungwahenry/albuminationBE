@@ -378,7 +378,7 @@ class BadgeSeeder extends Seeder
                 'icon'        => 'shield-check',
                 'rarity'      => 'rare',
                 'trigger'     => 'report_resolved',
-                'criteria'    => ['type' => 'attribute', 'field' => 'resolution', 'operator' => '=', 'value' => 'resolved'],
+                'criteria'    => ['type' => 'attribute', 'field' => 'status', 'operator' => '=', 'value' => 'actioned'],
             ],
             [
                 'slug'        => 'data_exported',
@@ -387,7 +387,7 @@ class BadgeSeeder extends Seeder
                 'icon'        => 'download',
                 'rarity'      => 'common',
                 'trigger'     => 'data_exported',
-                'criteria'    => ['type' => 'first', 'user_relation' => 'takes'], // placeholder — trigger fires once
+                'criteria'    => ['type' => 'always'],
             ],
 
             // ── Easter Eggs ───────────────────────────────────────────────────

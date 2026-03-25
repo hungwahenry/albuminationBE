@@ -17,6 +17,7 @@ use App\Listeners\EvaluateBadgesOnRotationCommentCreated;
 use App\Listeners\EvaluateBadgesOnRotationPublished;
 use App\Listeners\EvaluateBadgesOnStanCreated;
 use App\Listeners\EvaluateBadgesOnTakeReactionChanged;
+use App\Listeners\EvaluateBadgesOnReportResolved;
 use App\Listeners\EvaluateBadgesOnTakeReplyCreated;
 use App\Listeners\SendBadgeEarnedNotification;
 use App\Listeners\SendContentLovedNotifications;
@@ -57,6 +58,10 @@ class EventServiceProvider extends ServiceProvider
         ],
         StanCreated::class => [
             EvaluateBadgesOnStanCreated::class,
+        ],
+        ReportResolved::class => [
+            SendReportResolvedNotifications::class,
+            EvaluateBadgesOnReportResolved::class,
         ],
         BadgeEarned::class => [
             SendBadgeEarnedNotification::class,
