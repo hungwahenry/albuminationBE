@@ -24,7 +24,6 @@ use Filament\Infolists\Components\Section as InfoSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Storage;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
@@ -119,7 +118,7 @@ class BadgeResource extends Resource
             // ── Icon ──────────────────────────────────────────────────────────
 
             Section::make('Icon')->schema([
-                FileUpload::make('icon_file')
+                FileUpload::make('icon')
                     ->label('Badge Image')
                     ->disk('public')
                     ->directory('badges/icons')
@@ -295,11 +294,8 @@ class BadgeResource extends Resource
             ]),
 
             InfoSection::make('Icon')->schema([
-                ImageEntry::make('icon_file')
+                ImageEntry::make('icon')
                     ->label('Badge Image')
-                    ->getStateUsing(fn (Badge $record) => $record->icon_file
-                        ? Storage::disk('public')->url($record->icon_file)
-                        : null)
                     ->height(80)
                     ->placeholder('No image uploaded'),
             ]),

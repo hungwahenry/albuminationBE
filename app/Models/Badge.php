@@ -12,7 +12,6 @@ class Badge extends Model
         'name',
         'description',
         'icon',
-        'icon_file',
         'rarity',
         'trigger',
         'criteria',
