@@ -140,7 +140,7 @@ class User extends Authenticatable
 
     public function hasBadge(int $badgeId): bool
     {
-        return $this->badges()->where('badge_id', $badgeId)->exists();
+        return $this->badges()->wherePivot('badge_id', $badgeId)->exists();
     }
 
     public function hasBlocked(int $userId): bool

@@ -211,7 +211,12 @@ class BadgeResource extends Resource
                             ->label('Value')
                             ->placeholder('10')
                             ->helperText('Use null for null checks, true/false for booleans.')
-                            ->required(),
+                            ->afterStateHydrated(fn ($component, $state) =>
+                                $component->state($state === null ? 'null' : $state)
+                            )
+                            ->dehydrateStateUsing(fn ($state) =>
+                                $state === 'null' || $state === '' || $state === null ? null : $state
+                            ),
                     ]),
                 ])->hidden(fn (Get $get) => $get('criteria.type') !== 'attribute'),
 

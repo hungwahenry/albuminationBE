@@ -80,9 +80,9 @@ class BadgeRarityResource extends Resource
 
             InfoSection::make('Colors')->schema([
                 InfoGrid::make(3)->schema([
-                    TextEntry::make('color')->label('Primary Color')->copyable(),
-                    TextEntry::make('bg_color')->label('Solid Background')->copyable(),
-                    TextEntry::make('bg_light_color')->label('Light Background')->copyable(),
+                    ColorEntry::make('color')->label('Primary Color')->copyable(),
+                    ColorEntry::make('bg_color')->label('Solid Background')->copyable(),
+                    ColorEntry::make('bg_light_color')->label('Light Background')->copyable(),
                 ]),
             ]),
         ]);
