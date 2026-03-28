@@ -328,11 +328,11 @@ class BadgeResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('icon')
+                ImageColumn::make('icon')
                     ->label('Icon')
-                    ->size('lg')
-                    ->state(fn (Badge $record): string => $record->icon ?? '🎖️')
-                    ->extraAttributes(['style' => 'font-size:1.5rem; line-height:1;']),
+                    ->disk('public')
+                    ->size(40)
+                    ->rounded(),
 
                 TextColumn::make('name')->searchable()->sortable(),
 
