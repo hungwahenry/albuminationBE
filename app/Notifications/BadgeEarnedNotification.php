@@ -6,6 +6,7 @@ use App\Models\Badge;
 use App\Models\BadgeRarityConfig;
 use App\Notifications\Channels\ExpoPushChannel;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
@@ -32,7 +33,7 @@ class BadgeEarnedNotification extends Notification implements ShouldQueue
             'badge_slug'                => $this->badge->slug,
             'badge_name'                => $this->badge->name,
             'badge_description'         => $this->badge->description,
-            'badge_icon'                => $this->badge->icon ?: null,
+            'badge_icon_url'            => $this->badge->icon ? Storage::disk('public')->url($this->badge->icon) : null,
             'badge_rarity'              => $this->badge->rarity,
             'badge_rarity_label'        => $rarityConfig?->label,
             'badge_rarity_color'        => $rarityConfig?->color,
