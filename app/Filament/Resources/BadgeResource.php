@@ -118,23 +118,16 @@ class BadgeResource extends Resource
             // ── Icon ──────────────────────────────────────────────────────────
 
             Section::make('Icon')->schema([
-                Grid::make(2)->schema([
-                    TextInput::make('icon')
-                        ->label('Emoji or Icon Text')
-                        ->placeholder('🏆')
-                        ->helperText('Paste an emoji. Uploading an image below will replace this.'),
-
-                    FileUpload::make('icon_file')
-                        ->label('Upload Icon Image')
-                        ->disk('public')
-                        ->directory('badges/icons')
-                        ->image()
-                        ->imagePreviewHeight('80')
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
-                        ->maxSize(1024)
-                        ->nullable()
-                        ->helperText('PNG, WebP, or SVG. Max 1 MB. Replaces emoji above.'),
-                ]),
+                FileUpload::make('icon_file')
+                    ->label('Badge Image')
+                    ->disk('public')
+                    ->directory('badges/icons')
+                    ->image()
+                    ->imagePreviewHeight('80')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
+                    ->maxSize(1024)
+                    ->required()
+                    ->helperText('PNG, WebP, or SVG. Max 1 MB.'),
             ]),
 
             // ── Criteria Builder ──────────────────────────────────────────────
@@ -301,11 +294,11 @@ class BadgeResource extends Resource
             ]),
 
             InfoSection::make('Icon')->schema([
-                TextEntry::make('icon')->label('Emoji / Icon Text')->placeholder('—'),
-                ImageEntry::make('icon')
-                    ->label('Icon Preview')
+                ImageEntry::make('icon_file')
+                    ->label('Badge Image')
+                    ->disk('public')
                     ->height(80)
-                    ->visible(fn (Badge $record) => filled($record->icon) && str_starts_with($record->icon, 'http')),
+                    ->placeholder('No image uploaded'),
             ]),
 
             InfoSection::make('Trigger & Criteria')->schema([

@@ -6,6 +6,7 @@ use App\Models\BadgeRarityConfig;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class BadgeResource extends JsonResource
 {
@@ -19,7 +20,7 @@ class BadgeResource extends JsonResource
             'slug'          => $this->slug,
             'name'          => $this->name,
             'description'   => $this->description,
-            'icon'          => $this->icon,
+            'icon_url'      => $this->icon_file ? Storage::disk('public')->url($this->icon_file) : null,
             'rarity'        => $this->rarity,
             'rarity_config' => $rarityConfig ? [
                 'key'            => $rarityConfig->key,

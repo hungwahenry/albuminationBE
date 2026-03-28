@@ -16,12 +16,16 @@ class BadgeEvaluator
             ->where('active', true)
             ->get();
 
+        $earnedIds = $user->badges()->pluck('badges.id')->flip();
+
         foreach ($candidates as $badge) {
-            if ($user->hasBadge($badge->id)) {
+            if ($earnedIds->has($badge->id)) {
                 continue;
             }
 
             try {
+                if (empty($badge->criteria)) continue;
+
                 $evaluator = EvaluatorFactory::make($badge->criteria);
                 if ($evaluator->passes($user, $subject)) {
                     $this->award($user, $badge);

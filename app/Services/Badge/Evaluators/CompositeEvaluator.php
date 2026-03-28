@@ -18,8 +18,10 @@ class CompositeEvaluator implements BadgeEvaluatorContract
 
     public function passes(User $user, ?Model $subject): bool
     {
-        foreach ($this->criteria['criteria'] as $nested) {
-            if (!EvaluatorFactory::make($nested)->passes($user, $subject)) {
+        $nested = $this->criteria['criteria'] ?? array_values($this->criteria['evaluators'] ?? []);
+
+        foreach ($nested as $sub) {
+            if (!EvaluatorFactory::make($sub)->passes($user, $subject)) {
                 return false;
             }
         }
