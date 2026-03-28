@@ -29,18 +29,24 @@ class BadgeEarnedNotification extends Notification implements ShouldQueue
         );
 
         return [
-            'type'                      => 'badge_earned',
-            'badge_slug'                => $this->badge->slug,
-            'badge_name'                => $this->badge->name,
-            'badge_description'         => $this->badge->description,
-            'badge_icon'                => $this->badge->icon ? Storage::disk('public')->url($this->badge->icon) : null,
-            'badge_rarity'              => $this->badge->rarity,
-            'badge_rarity_label'        => $rarityConfig?->label,
-            'badge_rarity_color'        => $rarityConfig?->color,
-            'badge_rarity_bg_color'     => $rarityConfig?->bg_color,
-            'badge_rarity_bg_light'     => $rarityConfig?->bg_light_color,
-            'title'                     => 'Badge unlocked',
-            'message'                   => "You earned \"{$this->badge->name}\"",
+            'type'    => 'badge_earned',
+            'title'   => 'Badge unlocked',
+            'message' => "You earned \"{$this->badge->name}\"",
+            'badge'   => [
+                'slug'         => $this->badge->slug,
+                'name'         => $this->badge->name,
+                'description'  => $this->badge->description,
+                'icon_url'     => $this->badge->icon ? Storage::disk('public')->url($this->badge->icon) : null,
+                'rarity'       => $this->badge->rarity,
+                'rarity_config' => $rarityConfig ? [
+                    'key'            => $rarityConfig->key,
+                    'label'          => $rarityConfig->label,
+                    'color'          => $rarityConfig->color,
+                    'bg_color'       => $rarityConfig->bg_color,
+                    'bg_light_color' => $rarityConfig->bg_light_color,
+                ] : null,
+                'earned_at'    => now()->toISOString(),
+            ],
         ];
     }
 }
