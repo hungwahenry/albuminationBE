@@ -22,17 +22,19 @@ class ExpoPushChannel
             return;
         }
 
-        $payload = method_exists($notification, 'toDatabase')
-            ? $notification->toDatabase($notifiable)
-            : [];
-
-        $title = $payload['title'] ?? 'Albumination';
-        $actorName = $payload['actor']['display_name']
-            ?? $payload['actor']['username']
-            ?? null;
-        $message = $payload['message'] ?? '';
-        $body = $payload['body'] ?? ($actorName && $message ? "{$actorName} {$message}" : $message);
-        $data = $payload['data'] ?? $payload;
+        if (method_exists($notification, 'toPush')) {
+            $push  = $notification->toPush($notifiable);
+            $title = $push['title'] ?? 'Albumination';
+            $body  = $push['body'] ?? '';
+            $data  = $push['data'] ?? [];
+        } else {
+            $payload   = method_exists($notification, 'toDatabase') ? $notification->toDatabase($notifiable) : [];
+            $title     = $payload['title'] ?? 'Albumination';
+            $actorName = $payload['actor']['display_name'] ?? $payload['actor']['username'] ?? null;
+            $message   = $payload['message'] ?? '';
+            $body      = $actorName && $message ? "{$actorName} {$message}" : $message;
+            $data      = $payload['data'] ?? $payload;
+        }
 
         if ($body === '') {
             return;

@@ -3,9 +3,10 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class AdminBroadcastNotification extends Notification
+class AdminBroadcastNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -40,5 +41,20 @@ class AdminBroadcastNotification extends Notification
         }
 
         return $payload;
+    }
+
+    public function toPush(object $notifiable): array
+    {
+        $data = ['type' => 'broadcast'];
+
+        if ($this->intentType && $this->intentTarget) {
+            $data['intent'] = ['type' => $this->intentType, 'target' => $this->intentTarget];
+        }
+
+        return [
+            'title' => $this->title,
+            'body'  => $this->body,
+            'data'  => $data,
+        ];
     }
 }

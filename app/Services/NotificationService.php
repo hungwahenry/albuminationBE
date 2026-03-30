@@ -222,6 +222,19 @@ class NotificationService
     }
 
     /**
+     * Send a system notification directly — no grouping, no preference check.
+     * Used for badge awards, admin broadcasts, and other system-level events.
+     */
+    public function notifyDirect(User $recipient, object $notification, bool $withPush = false): void
+    {
+        Notification::sendNow($recipient, $notification, ['database']);
+
+        if ($withPush) {
+            Notification::sendNow($recipient, $notification, [ExpoPushChannel::class]);
+        }
+    }
+
+    /**
      * Dispatch a notification respecting user preferences and in-app grouping.
      */
     private function notifyWithGrouping(
