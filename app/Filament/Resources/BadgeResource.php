@@ -17,6 +17,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Filament\Infolists\Components\Grid as InfoGrid;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
@@ -42,27 +44,17 @@ class BadgeResource extends Resource
     protected static ?string $navigationGroup = 'Features';
     protected static ?int $navigationSort = 1;
 
-    // ─── Trigger options shared across form & filters ──────────────────────────
+    // ─── Trigger options for table filters — derived from live badge data ─────
 
     private static function triggerOptions(): array
     {
-        return [
-            'take_created'             => 'Take Created',
-            'rotation_published'       => 'Rotation Published',
-            'stan_created'             => 'Stan Created',
-            'rotation_comment_created' => 'Rotation Comment Created',
-            'take_reply_created'       => 'Take Reply Created',
-            'profile_updated'          => 'Profile Updated',
-            'take_reacted'             => 'Take Reacted',
-            'love_given'               => 'Love Given',
-            'love_received'            => 'Love Received',
-            'follow_given'             => 'Follow Given',
-            'follow_received'          => 'Follow Received',
-            'track_favourited'         => 'Track Favourited',
-            'album_seeded'             => 'Album Seeded',
-            'report_resolved'          => 'Report Resolved',
-            'data_exported'            => 'Data Exported',
-        ];
+        return Cache::remember('badge:trigger_options', 300, fn () =>
+            Badge::distinct()
+                ->orderBy('trigger')
+                ->pluck('trigger')
+                ->mapWithKeys(fn ($t) => [$t => Str::of($t)->replace('_', ' ')->title()->toString()])
+                ->all()
+        );
     }
 
     // ─── Form ──────────────────────────────────────────────────────────────────
@@ -93,20 +85,14 @@ class BadgeResource extends Resource
 
                 Grid::make(3)->schema([
                     Select::make('rarity')
-                        ->options([
-                            'common'    => 'Common',
-                            'rare'      => 'Rare',
-                            'epic'      => 'Epic',
-                            'legendary' => 'Legendary',
-                        ])
+                        ->options(fn () => \App\Models\BadgeRarityConfig::orderBy('sort_order')->pluck('label', 'key')->all())
                         ->required()
                         ->native(false),
 
-                    Select::make('trigger')
-                        ->options(self::triggerOptions())
+                    TextInput::make('trigger')
                         ->required()
-                        ->native(false)
-                        ->searchable(),
+                        ->placeholder('rotation_published')
+                        ->helperText('The event name that triggers evaluation (e.g. take_created, rotation_published).'),
 
                     Toggle::make('active')
                         ->default(true)
@@ -368,12 +354,7 @@ class BadgeResource extends Resource
             ->defaultSort('rarity')
             ->filters([
                 SelectFilter::make('rarity')
-                    ->options([
-                        'common'    => 'Common',
-                        'rare'      => 'Rare',
-                        'epic'      => 'Epic',
-                        'legendary' => 'Legendary',
-                    ]),
+                    ->options(fn () => \App\Models\BadgeRarityConfig::orderBy('sort_order')->pluck('label', 'key')->all()),
 
                 SelectFilter::make('trigger')
                     ->options(self::triggerOptions()),

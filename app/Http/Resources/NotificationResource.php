@@ -16,15 +16,6 @@ class NotificationResource extends JsonResource
 
         $actors = $raw['actors'] ?? array_filter([($raw['actor'] ?? null)]);
 
-        if (empty($actors)) {
-            $actors = [[
-                'id'           => 0,
-                'username'     => null,
-                'display_name' => 'System',
-                'avatar'       => null,
-            ]];
-        }
-
         return [
             'id'         => $this->id,
             'type'       => $raw['type'] ?? class_basename($this->type),

@@ -5,8 +5,9 @@ namespace App\Listeners;
 use App\Events\ReportResolved;
 use App\Jobs\EvaluateBadgesJob;
 use App\Models\Report;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class EvaluateBadgesOnReportResolved
+class EvaluateBadgesOnReportResolved implements ShouldQueue
 {
     public function handle(ReportResolved $event): void
     {

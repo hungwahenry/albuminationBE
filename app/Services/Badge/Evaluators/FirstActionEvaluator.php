@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Passes when the user has exactly 1 of the specified relation.
  *
- * Criteria: { "type": "first", "user_relation": "takes" }
+ * Basic:  { "type": "first", "user_relation": "takes" }
+ * Scoped: { "type": "first", "user_relation": "rotations", "where": {"status": "published"} }
  */
 class FirstActionEvaluator implements BadgeEvaluatorContract
 {
@@ -17,18 +18,12 @@ class FirstActionEvaluator implements BadgeEvaluatorContract
 
     public function passes(User $user, ?Model $subject): bool
     {
-        $relation = $this->criteria['user_relation'];
-        return $this->count($user, $relation) === 1;
-    }
+        $query = $user->{$this->criteria['user_relation']}();
 
-    private function count(User $user, string $relation): int
-    {
-        $query = $user->{$relation}();
-
-        if ($relation === 'rotations') {
-            $query->where('status', 'published');
+        foreach ($this->criteria['where'] ?? [] as $column => $value) {
+            $query->where($column, $value);
         }
 
-        return $query->count();
+        return $query->count() === 1;
     }
 }

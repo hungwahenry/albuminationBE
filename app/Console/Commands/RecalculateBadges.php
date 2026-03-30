@@ -14,21 +14,35 @@ class RecalculateBadges extends Command
 
     public function handle(BadgeEvaluator $evaluator): void
     {
-        $users = $this->option('user')
-            ? User::where('id', $this->option('user'))->get()
-            : User::all();
+        $triggers = Badge::where('active', true)->pluck('trigger')->unique()->values();
 
-        $triggers = Badge::where('active', true)->pluck('trigger')->unique();
+        if ($this->option('user')) {
+            $user = User::find($this->option('user'));
+            if (!$user) {
+                $this->error('User not found.');
+                return;
+            }
 
-        $bar = $this->output->createProgressBar($users->count());
-        $bar->start();
-
-        foreach ($users as $user) {
             foreach ($triggers as $trigger) {
                 $evaluator->evaluate($trigger, $user);
             }
-            $bar->advance();
+
+            $this->info('Badge recalculation complete.');
+            return;
         }
+
+        $total = User::count();
+        $bar   = $this->output->createProgressBar($total);
+        $bar->start();
+
+        User::query()->chunk(200, function ($users) use ($evaluator, $triggers, $bar) {
+            foreach ($users as $user) {
+                foreach ($triggers as $trigger) {
+                    $evaluator->evaluate($trigger, $user);
+                }
+                $bar->advance();
+            }
+        });
 
         $bar->finish();
         $this->newLine();

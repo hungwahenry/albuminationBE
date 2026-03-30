@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Badge extends Model
@@ -24,6 +25,11 @@ class Badge extends Model
             'criteria' => 'array',
             'active'   => 'boolean',
         ];
+    }
+
+    public function rarityConfig(): BelongsTo
+    {
+        return $this->belongsTo(BadgeRarityConfig::class, 'rarity', 'key');
     }
 
     public function users(): BelongsToMany

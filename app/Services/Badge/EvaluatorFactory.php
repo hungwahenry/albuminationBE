@@ -4,6 +4,7 @@ namespace App\Services\Badge;
 
 use App\Contracts\BadgeEvaluatorContract;
 use App\Services\Badge\Evaluators\AlwaysEvaluator;
+use App\Services\Badge\Evaluators\AnyCompositeEvaluator;
 use App\Services\Badge\Evaluators\AttributeEvaluator;
 use App\Services\Badge\Evaluators\CompositeEvaluator;
 use App\Services\Badge\Evaluators\CountThresholdEvaluator;
@@ -25,6 +26,7 @@ class EvaluatorFactory
             'time_window'        => new TimeWindowEvaluator($criteria),
             'profile_complete'   => new ProfileCompletenessEvaluator($criteria),
             'all'                => new CompositeEvaluator($criteria),
+            'any'                => new AnyCompositeEvaluator($criteria),
             'always'             => new AlwaysEvaluator(),
             default              => throw new InvalidArgumentException("Unknown badge evaluator type: [{$criteria['type']}]"),
         };

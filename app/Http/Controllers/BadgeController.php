@@ -14,7 +14,7 @@ class BadgeController extends Controller
 
     public function mine(Request $request): JsonResponse
     {
-        $badges = $request->user()->badges()->get();
+        $badges = $request->user()->badges()->with('rarityConfig')->get();
 
         return $this->success(BadgeResource::collection($badges));
     }
@@ -27,6 +27,8 @@ class BadgeController extends Controller
             return $this->error('User not found', 404);
         }
 
-        return $this->success(BadgeResource::collection($user->badges()->get()));
+        $badges = $user->badges()->with('rarityConfig')->get();
+
+        return $this->success(BadgeResource::collection($badges));
     }
 }

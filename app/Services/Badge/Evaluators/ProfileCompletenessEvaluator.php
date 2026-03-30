@@ -7,22 +7,31 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Passes when the user's profile has all key fields filled in.
+ * Passes when the user's profile has all required fields filled in.
  *
- * Criteria: { "type": "profile_complete" }
+ * Default fields: { "type": "profile_complete" }
+ * Custom fields:  { "type": "profile_complete", "fields": ["display_name", "username", "bio"] }
  */
 class ProfileCompletenessEvaluator implements BadgeEvaluatorContract
 {
+    private const DEFAULT_FIELDS = ['display_name', 'username', 'bio', 'avatar', 'location'];
+
+    public function __construct(private readonly array $criteria = []) {}
+
     public function passes(User $user, ?Model $subject): bool
     {
         $profile = $user->profile;
 
         if ($profile === null) return false;
 
-        return filled($profile->display_name)
-            && filled($profile->username)
-            && filled($profile->bio)
-            && filled($profile->avatar)
-            && filled($profile->location);
+        $fields = $this->criteria['fields'] ?? self::DEFAULT_FIELDS;
+
+        foreach ($fields as $field) {
+            if (!filled($profile->{$field})) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
