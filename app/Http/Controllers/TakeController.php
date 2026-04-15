@@ -85,4 +85,20 @@ class TakeController extends Controller
 
         return $this->success(null, 'Take deleted');
     }
+
+    public function show(Request $request, string $slug, Take $take): JsonResponse
+    {
+        $album = $this->findAlbum($slug);
+
+        if (!$album || $take->album_id !== $album->id) {
+            return $this->error('Take not found', 404);
+        }
+
+        $take->load([
+            'user.profile',
+            'reactions' => fn ($q) => $q->where('user_id', $request->user()->id),
+        ]);
+
+        return $this->success(new TakeResource($take));
+    }
 }

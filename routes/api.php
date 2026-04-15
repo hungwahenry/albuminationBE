@@ -95,6 +95,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::prefix('albums/{slug}/takes')->group(function () {
             Route::get('/', [TakeController::class, 'index']);
             Route::post('/', [TakeController::class, 'store'])->middleware('throttle:writes');
+            Route::get('/{take}', [TakeController::class, 'show']);
             Route::put('/{take}', [TakeController::class, 'update']);
             Route::delete('/{take}', [TakeController::class, 'destroy']);
             Route::post('/{take}/react', [TakeReactionController::class, 'react']);
