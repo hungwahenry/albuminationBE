@@ -75,6 +75,11 @@ class Album extends Model
         return $this->hasMany(Take::class);
     }
 
+    public function friendTakes(): HasMany
+    {
+        return $this->hasMany(Take::class);
+    }
+
     public function getCoverArtUrlAttribute(): string
     {
         return CoverArtService::url($this->mbid);

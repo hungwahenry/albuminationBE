@@ -45,6 +45,17 @@ class AlbumResource extends JsonResource
                     'join_phrase' => $artist->pivot->join_phrase,
                 ]),
             ]),
+            'friends_ratings' => $this->whenLoaded('friendTakes', fn () =>
+                $this->friendTakes->map(fn ($take) => [
+                    'user' => [
+                        'id'           => $take->user->id,
+                        'username'     => $take->user->profile->username,
+                        'display_name' => $take->user->profile->display_name,
+                        'avatar'       => $take->user->profile->avatar,
+                    ],
+                    'rating' => $take->rating,
+                ])
+            ),
         ];
     }
 }

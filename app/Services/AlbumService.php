@@ -16,7 +16,7 @@ class AlbumService
      * Find an album by slug or MBID, fetching from MusicBrainz if not stored locally.
      * Also fetches tracks if the album has none.
      */
-    public function show(string $slug, ?User $seedingUser = null): ?Album
+    public function show(string $slug, ?User $user = null): ?Album
     {
         $album = Album::with(['artists', 'tracks.artists'])
             ->where('slug', $slug)
@@ -34,9 +34,9 @@ class AlbumService
                 return null;
             }
 
-            if ($album->wasRecentlyCreated && $seedingUser) {
-                $album->update(['seeded_by_user_id' => $seedingUser->id]);
-                EvaluateBadgesJob::dispatch('album_seeded', $seedingUser->id, Album::class, $album->id);
+            if ($album->wasRecentlyCreated && $user) {
+                $album->update(['seeded_by_user_id' => $user->id]);
+                EvaluateBadgesJob::dispatch('album_seeded', $user->id, Album::class, $album->id);
             }
         }
 
@@ -44,6 +44,18 @@ class AlbumService
             $this->musicBrainz->fetchAlbumTracks($album);
         }
 
-        return $album->load(['artists', 'tracks.artists']);
+        $relations = ['artists', 'tracks.artists'];
+
+        if ($user) {
+            $followingIds = $user->following()->pluck('following_id');
+            $relations['friendTakes'] = fn ($q) => $q
+                ->whereIn('user_id', $followingIds)
+                ->where('is_deleted', false)
+                ->whereNotNull('rating')
+                ->with('user.profile')
+                ->limit(8);
+        }
+
+        return $album->load($relations);
     }
 }
