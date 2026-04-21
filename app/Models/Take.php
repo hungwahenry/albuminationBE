@@ -11,7 +11,7 @@ class Take extends Model
 {
     use Reportable;
 
-    protected $fillable = ['user_id', 'album_id', 'rating', 'body', 'is_deleted', 'edited_at'];
+    protected $fillable = ['user_id', 'album_id', 'rating', 'rating_flipped', 'body', 'is_deleted', 'edited_at'];
 
     protected function casts(): array
     {

@@ -31,6 +31,7 @@ class TakeResource extends JsonResource
             'body'            => $this->is_deleted ? null : $this->body,
             'is_deleted'      => $this->is_deleted,
             'is_edited'       => $this->edited_at !== null,
+            'rating_flipped'  => $this->rating_flipped,
             'can_edit'        => !$this->is_deleted && $this->edited_at === null && Auth::id() === $this->user_id,
             'is_mine'         => Auth::id() === $this->user_id,
             'agrees_count'    => $this->agrees_count,

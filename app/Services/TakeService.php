@@ -51,13 +51,16 @@ class TakeService
         return DB::transaction(function () use ($take, $rating, $body) {
             $oldRating = $take->rating;
 
+            $flipped = $oldRating !== $rating;
+
             $take->update([
-                'rating'    => $rating,
-                'body'      => $body,
-                'edited_at' => now(),
+                'rating'         => $rating,
+                'body'           => $body,
+                'edited_at'      => now(),
+                'rating_flipped' => $flipped,
             ]);
 
-            if ($oldRating !== $rating) {
+            if ($flipped) {
                 $take->album->increment($rating === 'hit' ? 'hits_count' : 'misses_count');
                 $take->album->decrement($oldRating === 'hit' ? 'hits_count' : 'misses_count');
             }
