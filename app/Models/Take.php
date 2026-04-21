@@ -16,8 +16,9 @@ class Take extends Model
     protected function casts(): array
     {
         return [
-            'is_deleted' => 'boolean',
-            'edited_at'  => 'datetime',
+            'is_deleted'     => 'boolean',
+            'rating_flipped' => 'boolean',
+            'edited_at'      => 'datetime',
         ];
     }
 
