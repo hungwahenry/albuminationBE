@@ -18,8 +18,16 @@ class AuthService
 
     public function sendMagicCode(string $email): array
     {
+        $email = strtolower(trim($email));
         $userExists = User::where('email', $email)->exists();
         $type = $userExists ? 'login' : 'signup';
+
+        // App Store review bypass: skip sending email code for approved reviewer accounts.
+        if ($this->isAppReviewBypassEligible($email)) {
+            MagicCode::where('email', $email)->delete();
+
+            return ['type' => $type];
+        }
 
         // Invalidate any existing codes for this email
         MagicCode::where('email', $email)->delete();
@@ -44,6 +52,31 @@ class AuthService
 
     public function verifyMagicCode(string $email, string $code): array
     {
+        $email = strtolower(trim($email));
+
+        if ($this->isAppReviewBypassEligible($email) && $this->isAppReviewBypassCode($code)) {
+            return DB::transaction(function () use ($email): array {
+                $existingUser = User::where('email', $email)->first();
+                $isSignup = !$existingUser;
+
+                $user = $existingUser ?? User::create([
+                    'email' => $email,
+                    'email_verified_at' => now(),
+                ]);
+
+                MagicCode::where('email', $email)->delete();
+
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return [
+                    'valid' => true,
+                    'user' => $user,
+                    'token' => $token,
+                    'is_new_user' => $isSignup,
+                ];
+            });
+        }
+
         $magicCode = MagicCode::where('email', $email)->first();
 
         if (!$magicCode || $magicCode->isExpired()) {
@@ -173,5 +206,27 @@ class AuthService
         $user->save();
 
         return ['valid' => true];
+    }
+
+    private function isAppReviewBypassEligible(string $email): bool
+    {
+        if (!config('services.app_review_auth.enabled', false)) {
+            return false;
+        }
+
+        $allowedEmails = config('services.app_review_auth.emails', []);
+
+        return in_array($email, $allowedEmails, true);
+    }
+
+    private function isAppReviewBypassCode(string $code): bool
+    {
+        $expectedCode = (string) config('services.app_review_auth.code', '');
+
+        if ($expectedCode === '') {
+            return false;
+        }
+
+        return hash_equals($expectedCode, $code);
     }
 }

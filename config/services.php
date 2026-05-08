@@ -48,4 +48,13 @@ return [
         'push_url' => env('EXPO_PUSH_URL', 'https://exp.host/--/api/v2/push/send'),
     ],
 
+    'app_review_auth' => [
+        'enabled' => env('APP_REVIEW_AUTH_ENABLED', false),
+        'emails' => array_values(array_filter(array_map(
+            fn (string $email) => strtolower(trim($email)),
+            explode(',', (string) env('APP_REVIEW_AUTH_EMAILS', '')),
+        ))),
+        'code' => env('APP_REVIEW_AUTH_CODE'),
+    ],
+
 ];
