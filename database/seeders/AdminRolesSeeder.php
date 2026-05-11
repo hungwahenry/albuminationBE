@@ -25,6 +25,7 @@ class AdminRolesSeeder extends Seeder
         'reports.action',
         'report_reasons.manage',
         'content.delete',
+        'moderation.manage',
 
         // Music catalog
         'catalog.view',
@@ -88,6 +89,7 @@ class AdminRolesSeeder extends Seeder
             'reports.action',
             'report_reasons.manage',
             'content.delete',
+            'moderation.manage',
             'rotations.view',
             'takes.view',
             'analytics.view',

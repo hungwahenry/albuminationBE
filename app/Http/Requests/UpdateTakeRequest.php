@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTakeRequest extends FormRequest
@@ -15,7 +16,7 @@ class UpdateTakeRequest extends FormRequest
     {
         return [
             'rating' => ['required', 'in:hit,miss'],
-            'body'   => ['required', 'string', 'max:1000'],
+            'body'   => ['required', 'string', 'max:1000', new PassesModeration()],
         ];
     }
 }

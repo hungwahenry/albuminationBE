@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRotationRequest extends FormRequest
@@ -14,8 +15,8 @@ class StoreRotationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'       => ['required', 'string', 'max:100'],
-            'caption'     => ['nullable', 'string', 'max:500'],
+            'title'       => ['required', 'string', 'max:100', new PassesModeration()],
+            'caption'     => ['nullable', 'string', 'max:500', new PassesModeration()],
             'type'        => ['required', 'in:album,track'],
             'is_ranked'   => ['sometimes', 'boolean'],
             'is_public'   => ['sometimes', 'boolean'],

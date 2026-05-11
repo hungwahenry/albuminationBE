@@ -48,6 +48,11 @@ return [
         'push_url' => env('EXPO_PUSH_URL', 'https://exp.host/--/api/v2/push/send'),
     ],
 
+    'openai' => [
+        'api_key'          => env('OPENAI_API_KEY'),
+        'moderation_model' => env('OPENAI_MODERATION_MODEL', 'omni-moderation-latest'),
+    ],
+
     'app_review_auth' => [
         'enabled' => env('APP_REVIEW_AUTH_ENABLED', false),
         'emails' => array_values(array_filter(array_map(

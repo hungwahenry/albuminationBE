@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRotationRequest extends FormRequest
@@ -14,8 +15,8 @@ class UpdateRotationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'       => ['sometimes', 'string', 'max:100'],
-            'caption'     => ['nullable', 'string', 'max:500'],
+            'title'       => ['sometimes', 'string', 'max:100', new PassesModeration()],
+            'caption'     => ['nullable', 'string', 'max:500', new PassesModeration()],
             'is_ranked'   => ['sometimes', 'boolean'],
             'is_public'   => ['sometimes', 'boolean'],
             'cover_image' => ['nullable', 'image', 'max:5120'],

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -17,9 +18,9 @@ class UpdateProfileRequest extends FormRequest
         $profileId = $this->user()->profile->id;
 
         return [
-            'display_name'      => ['sometimes', 'string', 'max:255'],
-            'username'          => ['sometimes', 'string', 'min:4', 'max:32', 'regex:/^[a-zA-Z0-9_]+$/', Rule::unique('profiles')->ignore($profileId)],
-            'bio'               => ['nullable', 'string', 'max:500'],
+            'display_name'      => ['sometimes', 'string', 'max:255', new PassesModeration()],
+            'username'          => ['sometimes', 'string', 'min:4', 'max:32', 'regex:/^[a-zA-Z0-9_]+$/', Rule::unique('profiles')->ignore($profileId), new PassesModeration()],
+            'bio'               => ['nullable', 'string', 'max:500', new PassesModeration()],
             'gender'            => ['nullable', 'string', 'in:male,female,non_binary,prefer_not_to_say'],
             'place_name'        => ['nullable', 'string', 'max:255'],
             'avatar'            => ['nullable', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048', 'dimensions:max_width=2000,max_height=2000'],

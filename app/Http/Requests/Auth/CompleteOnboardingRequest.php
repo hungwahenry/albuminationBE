@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CompleteOnboardingRequest extends FormRequest
@@ -14,8 +15,8 @@ class CompleteOnboardingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => ['required', 'string', 'min:4', 'max:32', 'regex:/^[a-zA-Z0-9_]+$/', 'unique:profiles,username'],
-            'display_name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'min:4', 'max:32', 'regex:/^[a-zA-Z0-9_]+$/', 'unique:profiles,username', new PassesModeration()],
+            'display_name' => ['required', 'string', 'max:255', new PassesModeration()],
             'avatar' => ['nullable', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048', 'dimensions:max_width=2000,max_height=2000'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
