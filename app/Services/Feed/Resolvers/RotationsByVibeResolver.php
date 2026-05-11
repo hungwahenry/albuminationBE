@@ -19,7 +19,8 @@ class RotationsByVibeResolver
             return new EmptyPaginator(new Collection(), 0, $perPage);
         }
 
-        return Rotation::with(['vibetags', 'user.profile'])
+        return Rotation::visibleTo($user)
+            ->with(['vibetags', 'user.profile'])
             ->whereHas('vibetags', fn ($q) => $q->where('vibetags.id', $vibetagId))
             ->where('status', 'published')
             ->where('is_public', true)

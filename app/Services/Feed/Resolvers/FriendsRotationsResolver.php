@@ -13,7 +13,8 @@ class FriendsRotationsResolver
     {
         $followingIds = $user->following()->pluck('following_id');
 
-        return Rotation::with(['vibetags', 'user.profile'])
+        return Rotation::visibleTo($user)
+            ->with(['vibetags', 'user.profile'])
             ->whereIn('user_id', $followingIds)
             ->where('status', 'published')
             ->where('is_public', true)

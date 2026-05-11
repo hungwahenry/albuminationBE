@@ -13,7 +13,8 @@ class PopularRotationsResolver
     {
         $days  = $section->config['days'] ?? 7;
 
-        return Rotation::with(['vibetags', 'user.profile'])
+        return Rotation::visibleTo($user)
+            ->with(['vibetags', 'user.profile'])
             ->where('status', 'published')
             ->where('is_public', true)
             ->where('published_at', '>=', now()->subDays($days))

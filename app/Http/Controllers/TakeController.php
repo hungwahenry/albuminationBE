@@ -32,7 +32,8 @@ class TakeController extends Controller
             return $this->error('Album not found', 404);
         }
 
-        $takes = Take::with([
+        $takes = Take::visibleTo($request->user())
+            ->with([
                 'user.profile',
                 'reactions' => fn ($q) => $q->where('user_id', $request->user()->id),
             ])

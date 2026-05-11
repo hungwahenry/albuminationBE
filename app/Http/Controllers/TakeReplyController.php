@@ -22,6 +22,7 @@ class TakeReplyController extends Controller
     public function index(Request $request, string $slug, Take $take): JsonResponse
     {
         $replies = $take->replies()
+            ->visibleTo($request->user())
             ->with([
                 'user.profile',
                 'replyToUser.profile',

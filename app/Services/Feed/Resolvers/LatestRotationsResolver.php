@@ -12,7 +12,8 @@ class LatestRotationsResolver
     public function resolve(FeedSection $section, User $user, int $perPage): LengthAwarePaginator
     {
 
-        return Rotation::with(['vibetags', 'user.profile'])
+        return Rotation::visibleTo($user)
+            ->with(['vibetags', 'user.profile'])
             ->where('status', 'published')
             ->where('is_public', true)
             ->latest('published_at')

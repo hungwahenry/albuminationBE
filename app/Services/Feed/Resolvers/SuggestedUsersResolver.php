@@ -14,11 +14,10 @@ class SuggestedUsersResolver
 
         $excludeIds = $user->following()->pluck('following_id')
             ->push($user->id)
-            ->merge($user->blocks()->pluck('blocked_user_id'))
-            ->merge($user->blockedBy()->pluck('user_id'))
             ->unique();
 
-        return Profile::with('user')
+        return Profile::visibleTo($user)
+            ->with('user')
             ->whereNotIn('user_id', $excludeIds)
             ->orderByDesc('followers_count')
             ->paginate($perPage);

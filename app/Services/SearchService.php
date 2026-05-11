@@ -7,6 +7,7 @@ use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Profile;
 use App\Models\Track;
+use App\Models\User;
 use App\Services\CoverArtService;
 use App\Services\MusicBrainz\MusicBrainzService;
 use Illuminate\Support\Collection;
@@ -20,7 +21,7 @@ class SearchService
 
     public function __construct(private MusicBrainzService $musicBrainz) {}
 
-    public function search(string $query, array $types = [], int $limit = 15): array
+    public function search(string $query, array $types = [], int $limit = 15, ?User $viewer = null): array
     {
         $types = !empty($types)
             ? array_intersect($types, self::VALID_TYPES)
@@ -32,7 +33,7 @@ class SearchService
                 'artist' => $this->searchArtists($query, $limit),
                 'album'  => $this->searchAlbums($query, $limit),
                 'track'  => $this->searchTracks($query, $limit),
-                'user'   => $this->searchUsers($query, $limit),
+                'user'   => $this->searchUsers($query, $limit, $viewer),
             };
         }
 
@@ -133,9 +134,10 @@ class SearchService
         return $mb->merge($local)->values()->take($limit)->all();
     }
 
-    private function searchUsers(string $query, int $limit): array
+    private function searchUsers(string $query, int $limit, ?User $viewer): array
     {
         return Profile::search($query)
+            ->query(fn ($q) => $q->visibleTo($viewer))
             ->take($limit)
             ->get()
             ->map(fn (Profile $profile) => [

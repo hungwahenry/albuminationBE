@@ -142,7 +142,7 @@ class NotificationService
             ->where('id', '!=', $author->id)
             ->chunkById(200, function (Collection $chunk) use ($author, $rotation) {
                 foreach ($chunk as $follower) {
-                    if ($follower->hasBlocked($author->id) || $follower->isBlockedBy($author->id)) {
+                    if (!$follower->isMutuallyClearOf($author->id)) {
                         continue;
                     }
 

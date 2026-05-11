@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HiddenFromBlockedUsers;
 use App\Traits\Reportable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Take extends Model
 {
-    use Reportable;
+    use HiddenFromBlockedUsers, Reportable;
 
     protected $fillable = ['user_id', 'album_id', 'rating', 'rating_flipped', 'body', 'is_deleted', 'edited_at'];
 

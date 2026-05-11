@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HiddenFromBlockedUsers;
 use App\Traits\Loveable;
 use App\Traits\Reportable;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RotationComment extends Model
 {
-    use Loveable, Reportable;
+    use HiddenFromBlockedUsers, Loveable, Reportable;
 
     protected $fillable = [
         'user_id',

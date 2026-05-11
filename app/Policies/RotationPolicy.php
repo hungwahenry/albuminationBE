@@ -16,7 +16,7 @@ class RotationPolicy
         $rotation = $args[0] ?? null;
 
         if ($rotation instanceof Rotation && $rotation->user_id !== $user->id) {
-            if ($user->hasBlocked($rotation->user_id) || $user->isBlockedBy($rotation->user_id)) {
+            if (!$user->isMutuallyClearOf($rotation->user_id)) {
                 return false;
             }
         }

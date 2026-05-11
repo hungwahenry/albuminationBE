@@ -13,7 +13,8 @@ class TopTakesResolver
     {
         $days  = $section->config['days'] ?? 7;
 
-        return Take::with(['user.profile', 'album.artists'])
+        return Take::visibleTo($user)
+            ->with(['user.profile', 'album.artists'])
             ->where('is_deleted', false)
             ->where('created_at', '>=', now()->subDays($days))
             ->orderByDesc('agrees_count')

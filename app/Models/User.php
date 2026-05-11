@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Collection;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -159,6 +160,19 @@ class User extends Authenticatable
         }
 
         return $this->blockedBy()->where('user_id', $userId)->exists();
+    }
+
+    public function isMutuallyClearOf(int $userId): bool
+    {
+        return !$this->hasBlocked($userId) && !$this->isBlockedBy($userId);
+    }
+
+    public function blockedUserIds(): Collection
+    {
+        return $this->blocks()->pluck('blocked_user_id')
+            ->merge($this->blockedBy()->pluck('user_id'))
+            ->unique()
+            ->values();
     }
 
     public function hasCompletedOnboarding(): bool

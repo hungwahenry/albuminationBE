@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HiddenFromBlockedUsers;
 use App\Traits\Loveable;
 use App\Traits\Reportable;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,7 +15,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class Rotation extends Model
 {
-    use HasSlug, Loveable, Reportable;
+    use HasSlug, HiddenFromBlockedUsers, Loveable, Reportable;
 
     protected $fillable = [
         'user_id',

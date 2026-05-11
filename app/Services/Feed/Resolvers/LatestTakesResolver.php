@@ -12,7 +12,8 @@ class LatestTakesResolver
     public function resolve(FeedSection $section, User $user, int $perPage): LengthAwarePaginator
     {
 
-        return Take::with(['user.profile', 'album.artists'])
+        return Take::visibleTo($user)
+            ->with(['user.profile', 'album.artists'])
             ->where('is_deleted', false)
             ->latest()
             ->paginate($perPage);

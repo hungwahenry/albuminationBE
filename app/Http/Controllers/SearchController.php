@@ -23,6 +23,7 @@ class SearchController extends Controller
             query: $request->validated('q'),
             types: $request->validated('types', []),
             limit: $request->integer('limit', 15),
+            viewer: $request->user(),
         );
 
         $resourceMap = [

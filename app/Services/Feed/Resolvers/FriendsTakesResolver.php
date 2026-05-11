@@ -13,7 +13,8 @@ class FriendsTakesResolver
     {
         $followingIds = $user->following()->pluck('following_id');
 
-        return Take::with(['user.profile', 'album.artists'])
+        return Take::visibleTo($user)
+            ->with(['user.profile', 'album.artists'])
             ->whereIn('user_id', $followingIds)
             ->where('is_deleted', false)
             ->latest()

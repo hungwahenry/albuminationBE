@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HiddenFromBlockedUsers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -9,7 +10,7 @@ use Laravel\Scout\Searchable;
 
 class Profile extends Model
 {
-    use Searchable;
+    use HiddenFromBlockedUsers, Searchable;
 
     protected $fillable = [
         'user_id',

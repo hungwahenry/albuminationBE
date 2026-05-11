@@ -29,7 +29,7 @@ class FollowController extends Controller
             return $this->error('You cannot follow yourself', 422);
         }
 
-        if ($request->user()->hasBlocked($target->id) || $target->hasBlocked($request->user()->id)) {
+        if (!$request->user()->isMutuallyClearOf($target->id)) {
             return $this->error('Cannot follow this user', 403);
         }
 

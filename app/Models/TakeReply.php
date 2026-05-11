@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HiddenFromBlockedUsers;
 use App\Traits\Loveable;
 use App\Traits\Reportable;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TakeReply extends Model
 {
-    use Loveable, Reportable;
+    use HiddenFromBlockedUsers, Loveable, Reportable;
 
     protected $fillable = ['user_id', 'take_id', 'reply_to_user_id', 'body', 'gif_url', 'is_deleted'];
 

@@ -22,6 +22,7 @@ class RotationCommentController extends Controller
     public function index(Request $request, Rotation $rotation): JsonResponse
     {
         $comments = $rotation->comments()
+            ->visibleTo($request->user())
             ->whereNull('parent_id')
             ->with([
                 'user.profile',
@@ -41,6 +42,7 @@ class RotationCommentController extends Controller
         }
 
         $replies = $comment->replies()
+            ->visibleTo($request->user())
             ->with([
                 'user.profile',
                 'replyToUser.profile',
