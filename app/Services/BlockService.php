@@ -13,7 +13,7 @@ class BlockService
     public function block(User $blocker, User $target): void
     {
         DB::transaction(function () use ($blocker, $target) {
-            Block::firstOrCreate([
+            $block = Block::firstOrCreate([
                 'user_id'         => $blocker->id,
                 'blocked_user_id' => $target->id,
             ]);
@@ -21,6 +21,14 @@ class BlockService
             // Remove mutual follows
             $this->followService->removeFollower($target, $blocker);
             $this->followService->removeFollower($blocker, $target);
+
+            if ($block->wasRecentlyCreated) {
+                activity('moderation')
+                    ->causedBy($blocker)
+                    ->performedOn($target)
+                    ->withProperties(['action' => 'user_blocked'])
+                    ->log('User blocked another user');
+            }
         });
     }
 

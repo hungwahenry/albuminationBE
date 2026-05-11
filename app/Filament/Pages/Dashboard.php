@@ -7,6 +7,7 @@ use App\Filament\Widgets\CatalogStatsWidget;
 use App\Filament\Widgets\ContentStatsWidget;
 use App\Filament\Widgets\EngagementChartWidget;
 use App\Filament\Widgets\ModerationStatsWidget;
+use App\Filament\Widgets\MostBlockedUsersWidget;
 use App\Filament\Widgets\TopAlbumsWidget;
 use App\Filament\Widgets\UserGrowthChartWidget;
 use App\Filament\Widgets\UserStatsWidget;
@@ -23,6 +24,7 @@ class Dashboard extends BaseDashboard
             UserStatsWidget::class,
             ContentStatsWidget::class,
             ModerationStatsWidget::class,
+            MostBlockedUsersWidget::class,
             UserGrowthChartWidget::class,
             TopAlbumsWidget::class,
             CatalogStatsWidget::class,
