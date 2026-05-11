@@ -32,6 +32,6 @@ class PassesModeration implements ValidationRule
             ])
             ->log('Content blocked by moderation');
 
-        $fail("Your :attribute couldn't be posted because it violates our community guidelines.");
+        $fail("This couldn't be posted because it violates our community guidelines.");
     }
 }
